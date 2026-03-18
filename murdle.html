@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Murdle Online Tracker - Field Bureau</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            font-family: 'Georgia', serif;
+        }
+
+        #grid-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+        }
+
+        .logic-grid-window {
+            background: white;
+            border: 6px solid black;
+            padding: 1rem;
+            width: fit-content;
+            max-width: 98vw;
+            max-height: 95vh;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 15px 15px 0px 0px rgba(0,0,0,1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logic-table {
+            border-collapse: collapse;
+            user-select: none;
+            margin: 0 auto;
+            background: white;
+            table-layout: fixed;
+        }
+
+        .logic-table td, .logic-table th {
+            border: 1px solid black;
+            width: 45px;
+            height: 45px;
+            padding: 0;
+            text-align: center;
+            vertical-align: middle;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .grid-cell {
+            cursor: pointer;
+            font-weight: 900;
+            font-size: 1.5rem; 
+            line-height: 1;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .corner-cell { background-color: #f3f4f6; }
+        .header-cell { background-color: #000; color: #fff; cursor: pointer; }
+        
+        .section-divider-v { border-right: 3px solid black !important; }
+        .section-divider-h { border-bottom: 3px solid black !important; }
+
+        @media (min-width: 640px) {
+            .logic-table td, .logic-table th { width: 60px; height: 60px; }
+            .grid-cell { font-size: 2rem; }
+        }
+
+        .cell-x { color: #dc2626; }
+        .cell-o { color: #16a34a; }
+        .cell-maybe { color: #d97706; }
+        
+        .header-icon {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2.5;
+            margin: auto;
+        }
+
+        .fab-trigger {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 72px;
+            height: 72px;
+            background: black;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            z-index: 40;
+            border: 4px solid white;
+        }
+
+        #info-modal, #document-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #000; }
+        
+        /* Alert Modal specific style */
+        #custom-alert {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-stone-100 min-h-screen text-slate-900 overflow-x-hidden pb-24">
+
+    <!-- Expanded Grid Popup -->
+    <div id="grid-overlay" onclick="toggleGrid(false)">
+        <div class="logic-grid-window" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b-4 border-black">
+                <h3 class="font-black uppercase tracking-tighter text-xl italic">LOGIC CROSS-MATRIX</h3>
+                <button onclick="toggleGrid(false)" class="bg-black text-white px-3 py-1 font-black text-xs uppercase hover:bg-stone-800">Close</button>
+            </div>
+            
+            <div class="overflow-auto custom-scrollbar border-2 border-black">
+                <table id="logic-grid-table" class="logic-table"></table>
+            </div>
+
+            <div class="mt-4 flex justify-around items-center border-t-2 border-dashed border-stone-300 pt-3">
+                <div class="flex flex-col items-center"><span class="text-red-600 font-black text-xl">X</span><span class="text-[8px] font-black uppercase text-stone-400">NO</span></div>
+                <div class="flex flex-col items-center"><span class="text-amber-500 font-black text-xl">?</span><span class="text-[8px] font-black uppercase text-stone-400">MAYBE</span></div>
+                <div class="flex flex-col items-center"><span class="text-green-600 font-black text-xl">O</span><span class="text-[8px] font-black uppercase text-stone-400">YES</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- General Info Modal (for Suspects, Weapons, Locations) -->
+    <div id="info-modal" onclick="closeModal(event)">
+        <div class="bg-white border-[8px] border-black p-8 max-w-sm w-full relative shadow-[15px_15px_0px_0px_rgba(0,0,0,1)]" onclick="event.stopPropagation()">
+            <button onclick="document.getElementById('info-modal').style.display='none'" class="absolute -top-4 -right-4 bg-black text-white w-12 h-12 text-3xl font-black rounded-full hover:bg-stone-800">&times;</button>
+            <div id="modal-content" class="text-center">
+                <div id="modal-icon" class="w-20 h-20 mx-auto mb-4 text-black"></div>
+                <h2 id="modal-title" class="text-2xl font-black uppercase italic mb-2 tracking-tighter border-b-4 border-black pb-1"></h2>
+                <div id="modal-tags" class="flex flex-wrap justify-center gap-2 mb-4"></div>
+                <p id="modal-body" class="text-md italic leading-tight text-slate-800 text-left"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Evidence Modal -->
+    <div id="document-modal" onclick="closeDocumentModal(event)">
+        <div class="bg-[#fdfbf7] border-[6px] border-black p-8 md:p-12 max-w-2xl w-full relative shadow-[15px_15px_0px_0px_rgba(0,0,0,1)] font-mono text-sm md:text-base text-black" onclick="event.stopPropagation()">
+            <button onclick="closeDocumentModal(event)" class="close-btn absolute -top-4 -right-4 bg-black text-white w-12 h-12 text-3xl font-black rounded-full flex items-center justify-center hover:bg-stone-800">&times;</button>
+            
+            <svg viewBox="0 0 24 24" fill="currentColor" class="w-16 h-16 mx-auto mb-8">
+                <path d="M12 2L2 7l10 5 10-5-10-5zm0 7.5l-10-5v2.5l10 5 10-5v-2.5l-10 5zm0 5l-10-5v2.5l10 5 10-5v-2.5l-10 5z"/>
+            </svg>
+
+            <p class="font-bold mb-6 leading-relaxed">
+                The following excerpt is from page 89 of <i class="italic font-bold">How I Murdered My Husband: An Idunnit</i>, by Dame Obsidian:
+            </p>
+            
+            <blockquote class="pl-8 mb-6 italic leading-loose text-slate-800 text-[15px] md:text-lg tracking-wide">
+                At the time, I was struggling with my latest whodunit, The Terrifying Tale of the Beautiful Bride. I heard footsteps in the student union. It felt like an ordinary, normal day, but of course, it wasn't.
+            </blockquote>
+            
+            <p class="font-bold leading-relaxed">
+                Inspector Irratino had underlined this passage and written "Coincidence?" beside it. But was it?
+            </p>
+        </div>
+    </div>
+
+    <!-- Custom Alert Modal -->
+    <div id="custom-alert" class="fixed inset-0 bg-black/80 z-[200] flex items-center justify-center p-4">
+        <div class="bg-white border-8 border-black p-8 max-w-md w-full shadow-[15px_15px_0px_0px_rgba(250,204,21,1)] text-center relative">
+            <h2 class="text-3xl font-black uppercase italic tracking-tighter mb-4 border-b-4 border-black pb-2">Bureau Notice</h2>
+            <p id="alert-text" class="text-xl font-bold italic mb-6"></p>
+            <button onclick="document.getElementById('custom-alert').style.display='none'" class="bg-black text-white px-8 py-3 font-black uppercase text-xl hover:bg-stone-800 w-full">Understood</button>
+        </div>
+    </div>
+
+    <!-- FAB -->
+    <div class="fab-trigger" onclick="toggleGrid(true)">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+        <span class="text-[10px] font-black uppercase tracking-tighter mt-1">Matrix</span>
+    </div>
+
+    <div class="max-w-4xl mx-auto min-h-screen flex flex-col p-4 md:p-8">
+        <header class="border-b-[8px] border-black pb-6 mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+            <div class="space-y-2">
+                <h1 class="text-6xl md:text-8xl font-black uppercase tracking-tighter italic leading-none">MURDLE</h1>
+                <div class="flex items-center gap-4">
+                    <span class="bg-black text-white px-3 py-1 text-xs font-black uppercase tracking-widest">Case File</span>
+                    <select id="case-selector" onchange="switchCase(this.value)" class="bg-white border-4 border-black text-lg font-black px-4 py-1 outline-none cursor-pointer">
+                        <option value="case-tutorial">File 000: Deduction College</option>
+                        <option value="case-art">File 003: Art of the Kill</option>
+                    </select>
+                </div>
+            </div>
+            <div class="text-right font-mono font-black text-2xl border-4 border-black px-4 py-2 bg-white">
+                <span id="date-display"></span>
+            </div>
+        </header>
+
+        <main class="space-y-12">
+            <!-- Dossier -->
+            <section>
+                <h2 class="bg-black text-white px-4 py-1 inline-block font-black uppercase text-sm tracking-widest mb-6 italic">Classified Dossier</h2>
+                <div id="dossier-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-4 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                        <h3 class="font-black border-b-2 border-black mb-2 uppercase text-[10px] text-slate-500">Suspects</h3>
+                        <ul class="space-y-2" id="suspect-names"></ul>
+                    </div>
+                    <div class="bg-white p-4 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                        <h3 class="font-black border-b-2 border-black mb-2 uppercase text-[10px] text-slate-500">Locations</h3>
+                        <ul class="space-y-2" id="location-names"></ul>
+                    </div>
+                    <div class="bg-white p-4 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                        <h3 class="font-black border-b-2 border-black mb-2 uppercase text-[10px] text-slate-500">Weapons</h3>
+                        <ul class="space-y-2" id="weapon-names"></ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Evidence -->
+            <section class="bg-white border-4 border-black p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] relative">
+                <div class="absolute -top-4 left-6 bg-yellow-400 border-2 border-black px-4 py-1 font-black uppercase text-xs italic">Field Evidence</div>
+                <div id="clues-container" class="space-y-6 font-bold italic text-xl leading-relaxed text-slate-800"></div>
+            </section>
+
+            <!-- Verdict -->
+            <section class="bg-stone-900 text-white p-8 border-4 border-black shadow-[15px_15px_0px_0px_rgba(0,0,0,1)]">
+                <h2 class="font-black uppercase text-sm mb-6 text-center tracking-[0.4em] text-yellow-400">Final Verdict</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <select id="solve-who" class="bg-white text-black font-black p-3 border-4 border-black outline-none italic"></select>
+                    <select id="solve-what" class="bg-white text-black font-black p-3 border-4 border-black outline-none italic"></select>
+                    <select id="solve-where" class="bg-white text-black font-black p-3 border-4 border-black outline-none italic"></select>
+                </div>
+                <button onclick="checkSolution()" class="w-full mt-8 bg-yellow-400 text-black py-4 font-black uppercase text-2xl hover:bg-yellow-300 transition-colors">Submit Findings</button>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const icons = {
+            // SUSPECTS
+            "Mrs. Ruby": { 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`, 
+                info: "An international jewel thief, playgirl, and all-around charmer. She knows how to party... and kill! (But has she settled down?)",
+                tags: ["5'6\"", "Right-handed", "Green Eyes", "Red Hair", "Libra"]
+            },
+            "Captain Slate": { 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/></svg>`, 
+                info: "A real-life astronaut. The first woman to travel around the dark side of the moon and also the first to be suspected of murdering her co-pilot.",
+                tags: ["5'5\"", "Left-handed", "Brown Eyes", "Brown Hair", "Aquarius"]
+            },
+            "Vice President Mauve": { 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`, 
+                info: "Vice President of TekCo Futures. If she asks you to step into her metaverse, run away.",
+                tags: ["5'8\"", "Right-handed", "Brown Eyes", "Black Hair", "Taurus"]
+            },
+            "Bishop Azure": { 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1 3-6z"/></svg>`, 
+                info: "A bishop in a local church, she has been known to pray for both her friends and her enemies. Of course, she asks for different things...",
+                tags: ["5'4\"", "Right-handed", "Light Brown Eyes", "Dark Brown Hair"]
+            },
+            "Blackstone, Esq.": { 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16M3 10h18"/></svg>`, 
+                info: "Incredibly talented at the most important skill for an attorney: getting paid.",
+                tags: ["6'0\"", "Right-handed", "Black Eyes", "Black Hair"]
+            },
+
+            // LOCATIONS
+            "The Library": { 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V5H6.5A2.5 2.5 0 0 0 4 7.5v12z"/></svg>`, 
+                info: "There are books on practically every subject in here, but mostly murder. No talking above a whisper or the librarian will stab you.",
+                tags: ["Indoors"]
+            },
+            "The Quad": { 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>`, 
+                info: "A grassy square where students relax, read, and contemplate who they'll murder next. Don't leave your frisbee here; it's a tripping hazard.",
+                tags: ["Outdoors"]
+            },
+            "The Science Lab": { 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2l4.5 9 4.5 9H3l4.5-9L12 2z"/></svg>`, 
+                info: "You can find all sorts of chemicals here. You could build a bomb. Or you could just use them to make a really cool volcano for the science fair.",
+                tags: ["Indoors"]
+            },
+            "The Rooftop Garden": { 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`, 
+                info: "A rooftop garden! With pigeons! And you can feed the pigeons! Very cool.",
+                tags: ["Outdoors"]
+            },
+            "The Entry Hall": { 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M3 21V3h18v18M3 7h18M9 21v-8h6v8"/></svg>`, 
+                info: "According to a plaque on the wall, even the architecture of the entry hall is art.",
+                tags: ["Indoors"]
+            },
+            "An Art Studio": { 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10-4.48 10-10 10z"/></svg>`, 
+                info: "In the back of the museum, it's littered with flyers for art classes.",
+                tags: ["Indoors"]
+            },
+
+            // WEAPONS
+            "A Yo-Yo": { 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>`, 
+                info: "It goes up, it goes down. And it can also go around a neck.",
+                tags: ["Light-weight", "Made of Plastic & Twine"]
+            },
+            "A Poisoned Apple": { 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2s-2 2-2 4c0 3 2 5 2 5s2-2 2-5c0-2-2-4-2-4z"/><circle cx="12" cy="14" r="8"/></svg>`, 
+                info: "If you're a teacher and you get an apple, ask yourself if the student wants you dead.",
+                tags: ["Medium-weight", "Made of Apple & Toxins"]
+            },
+            "A Human Skull": { 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2C7.58 2 4 5.58 4 10c0 4.42 3 8 3 8l1 4h8l1-4s3-3.58 3-8c0-4.42-3.58-8-8-8z"/><circle cx="9" cy="10" r="1"/><circle cx="15" cy="10" r="1"/><path d="M10 16h4"/></svg>`, 
+                info: "\"Alas, poor Yorick, I knew him. And now I'm swinging his skull at people.\"",
+                tags: ["Medium-weight", "Made of Bone"]
+            },
+            "A Glass of Poisoned Wine": { 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M15 2H9v2h6V2zM12 11c-2.21 0-4-1.79-4-4h8c0 2.21-1.79 4-4 4zm1 1h-2v7h-2v2h6v-2h-2v-7z"/></svg>`, 
+                info: "This is your typical glass of poisoned wine. A mystery classic.",
+                tags: ["Light-weight"]
+            },
+            "An Abstract Statue": { 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2l-8 16h16L12 2z"/></svg>`, 
+                info: "No matter how hard he looked at this, Logico did not understand.",
+                tags: ["Heavy-weight"]
+            },
+            "A Rare Vase": { 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M19 4H5c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2h1v10c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V10h1c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z"/></svg>`, 
+                info: "Logico thought about how, technically, every vase someone makes by hand is rare.",
+                tags: ["Heavy-weight"]
+            }
+        };
+
+        const cases = {
+            "case-tutorial": {
+                id: "case-tutorial",
+                title: "Deduction College",
+                suspects: ["Mrs. Ruby", "Captain Slate", "Vice President Mauve"],
+                locations: ["The Library", "The Quad", "The Science Lab"],
+                weapons: ["A Yo-Yo", "A Poisoned Apple", "A Human Skull"],
+                clues: [
+                    "A yo-yo was not in the library.",
+                    "Mrs. Ruby was in a place coincidentally referenced in Dame Obsidian's famous 'unauthorized autobiography' <button onclick='openDocumentModal()' class='inline-block align-middle ml-2 bg-yellow-300 text-black border-2 border-black px-2 py-1 text-xs font-black uppercase tracking-widest hover:bg-yellow-400 active:translate-y-[2px] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer'>[View Excerpt]</button>.",
+                    "A messenger from The Blessed Denomination of the Green Goblet gave Logico a note that read: ECIV TNEDISERP EVUAM DAH A NAMUH LLUKS (Vice President Mauve had a human skull).",
+                    "Captain Slate had never been on the quad.",
+                    "A poisoned apple was clearly used to commit the crime."
+                ],
+                solution: { who: "Captain Slate", what: "A Poisoned Apple", where: "The Science Lab" }
+            },
+            "case-art": {
+                id: "case-art",
+                title: "Art of the Kill",
+                suspects: ["Captain Slate", "Bishop Azure", "Blackstone, Esq."],
+                locations: ["The Rooftop Garden", "The Entry Hall", "An Art Studio"],
+                weapons: ["A Glass of Poisoned Wine", "An Abstract Statue", "A Rare Vase"],
+                clues: [
+                    "Blackstone, Esq., was suspicious of the person who brought an abstract statue.",
+                    "Captain Slate brought a glass of poisoned wine.",
+                    "An abstract statue was not in the art studio.",
+                    "Either Blackstone, Esq., was standing on top of flyers for art classes, or Captain Slate was in the rooftop garden.",
+                    "The body of the experimental artist was found under a plaque on the wall (The Entry Hall)."
+                ],
+                solution: { who: "Captain Slate", what: "A Glass of Poisoned Wine", where: "The Entry Hall" }
+            }
+        };
+
+        let currentCaseId = "case-tutorial";
+
+        function init() {
+            const today = new Date();
+            document.getElementById('date-display').innerText = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
+            renderCase();
+        }
+
+        function switchCase(id) {
+            currentCaseId = id;
+            renderCase();
+        }
+
+        function renderCase() {
+            const activeCase = cases[currentCaseId];
+            const renderL = (id, items) => {
+                document.getElementById(id).innerHTML = items.map(item => `
+                    <li class="flex items-center gap-3 border-b border-stone-200 pb-2 cursor-pointer hover:bg-yellow-50" onclick="openModal('${item}')">
+                        <div class="w-8 h-8 flex-shrink-0 bg-black text-white p-1 rounded-sm">${icons[item]?.svg || ''}</div>
+                        <span class="font-black text-[11px] uppercase truncate">${item}</span>
+                    </li>
+                `).join('');
+            };
+            renderL('suspect-names', activeCase.suspects);
+            renderL('location-names', activeCase.locations);
+            renderL('weapon-names', activeCase.weapons);
+
+            document.getElementById('clues-container').innerHTML = activeCase.clues.map(clue => `<p class="border-l-4 border-black pl-4 py-2">${clue}</p>`).join('');
+
+            const pop = (id, items, label) => {
+                const s = document.getElementById(id);
+                s.innerHTML = `<option value="">${label}?</option>` + items.map(i => `<option value="${i}">${i}</option>`).join('');
+            };
+            pop('solve-who', activeCase.suspects, 'WHO');
+            pop('solve-what', activeCase.weapons, 'WHAT');
+            pop('solve-where', activeCase.locations, 'WHERE');
+
+            createMatrix();
+            loadState();
+        }
+
+        function createMatrix() {
+            const table = document.getElementById('logic-grid-table');
+            table.innerHTML = '';
+            const activeCase = cases[currentCaseId];
+            const suspects = activeCase.suspects;
+            const weapons = activeCase.weapons;
+            const locations = activeCase.locations;
+
+            const trH = document.createElement('tr');
+            trH.appendChild(Object.assign(document.createElement('th'), { className: 'corner-cell' }));
+            weapons.forEach((w, idx) => {
+                const th = document.createElement('th');
+                th.className = "header-cell" + (idx === weapons.length - 1 ? " section-divider-v" : "");
+                th.innerHTML = icons[w]?.svg || '';
+                th.onclick = () => openModal(w);
+                trH.appendChild(th);
+            });
+            locations.forEach((l, idx) => {
+                const th = document.createElement('th');
+                th.className = "header-cell";
+                th.innerHTML = icons[l]?.svg || '';
+                th.onclick = () => openModal(l);
+                trH.appendChild(th);
+            });
+            table.appendChild(trH);
+
+            suspects.forEach((s, sIdx) => {
+                const tr = document.createElement('tr');
+                const th = document.createElement('th');
+                th.className = "header-cell" + (sIdx === suspects.length - 1 ? " section-divider-h" : "");
+                th.innerHTML = icons[s]?.svg || '';
+                th.onclick = () => openModal(s);
+                tr.appendChild(th);
+                weapons.forEach((_, wIdx) => { tr.appendChild(createCell(`svw-${sIdx}-${wIdx}`, sIdx === suspects.length - 1, wIdx === weapons.length - 1)); });
+                locations.forEach((_, lIdx) => { tr.appendChild(createCell(`svl-${sIdx}-${lIdx}`, sIdx === suspects.length - 1, false)); });
+                table.appendChild(tr);
+            });
+
+            locations.forEach((l, lRowIdx) => {
+                const tr = document.createElement('tr');
+                const th = document.createElement('th');
+                th.className = "header-cell";
+                th.innerHTML = icons[l]?.svg || '';
+                th.onclick = () => openModal(l);
+                tr.appendChild(th);
+                weapons.forEach((_, wIdx) => { tr.appendChild(createCell(`lvw-${lRowIdx}-${wIdx}`, false, wIdx === weapons.length - 1)); });
+                locations.forEach(() => { tr.appendChild(Object.assign(document.createElement('td'), { className: "bg-stone-200" })); });
+                table.appendChild(tr);
+            });
+        }
+
+        function createCell(id, divH, divV) {
+            const td = document.createElement('td');
+            if (divH) td.classList.add('section-divider-h');
+            if (divV) td.classList.add('section-divider-v');
+            const cell = document.createElement('div');
+            cell.className = "grid-cell";
+            cell.dataset.state = "empty";
+            cell.id = `${currentCaseId}-cell-${id}`;
+            cell.onclick = () => {
+                const states = ['empty', 'x', 'maybe', 'o'];
+                const next = states[(states.indexOf(cell.dataset.state) + 1) % states.length];
+                cell.dataset.state = next;
+                cell.innerHTML = next === 'empty' ? '' : (next === 'x' ? 'X' : (next === 'maybe' ? '?' : 'O'));
+                cell.className = `grid-cell cell-${next}`;
+                saveState();
+            };
+            td.appendChild(cell);
+            return td;
+        }
+
+        function toggleGrid(show) { document.getElementById('grid-overlay').style.display = show ? 'flex' : 'none'; }
+
+        // General info modal (suspects, weapons, locations)
+        function openModal(item) {
+            const data = icons[item];
+            if (!data) return;
+            document.getElementById('modal-icon').innerHTML = data.svg;
+            document.getElementById('modal-title').innerText = item;
+            document.getElementById('modal-body').innerText = data.info;
+            const tagsCont = document.getElementById('modal-tags');
+            tagsCont.innerHTML = (data.tags || []).map(t => `
+                <span class="bg-stone-100 border border-black px-2 py-0.5 text-[10px] font-black uppercase tracking-tight">${t}</span>
+            `).join('');
+            document.getElementById('info-modal').style.display = 'flex';
+        }
+
+        function closeModal(e) { if (e.target.id === 'info-modal') document.getElementById('info-modal').style.display = 'none'; }
+
+        // Document specific modal logic
+        function openDocumentModal() {
+            document.getElementById('document-modal').style.display = 'flex';
+        }
+
+        function closeDocumentModal(e) { 
+            if (!e || e.target.id === 'document-modal' || e.target.closest('.close-btn')) {
+                document.getElementById('document-modal').style.display = 'none'; 
+            }
+        }
+
+        function checkSolution() {
+            const activeCase = cases[currentCaseId];
+            const who = document.getElementById('solve-who').value;
+            const what = document.getElementById('solve-what').value;
+            const where = document.getElementById('solve-where').value;
+            const alertText = document.getElementById('alert-text');
+            if (!who || !what || !where) { alertText.innerText = "The Bureau requires all three variables."; } 
+            else if (who === activeCase.solution.who && what === activeCase.solution.what && where === activeCase.solution.where) {
+                alertText.innerText = `CORRECT! ${who} committed the crime in ${where} with ${what}.`;
+            } else { alertText.innerText = "INCORRECT. Your deduction does not match the evidence."; }
+            document.getElementById('custom-alert').style.display = 'block';
+        }
+
+        function saveState() {
+            const grid = JSON.parse(localStorage.getItem(`murdle_matrix_v5`) || '{}');
+            document.querySelectorAll('.grid-cell').forEach(c => grid[c.id] = c.dataset.state);
+            localStorage.setItem(`murdle_matrix_v5`, JSON.stringify(grid));
+        }
+
+        function loadState() {
+            const grid = JSON.parse(localStorage.getItem(`murdle_matrix_v5`) || '{}');
+            Object.entries(grid).forEach(([id, s]) => {
+                const cell = document.getElementById(id);
+                if (cell) {
+                    cell.dataset.state = s;
+                    cell.innerHTML = s === 'empty' ? '' : (s === 'x' ? 'X' : (s === 'maybe' ? '?' : 'O'));
+                    cell.className = `grid-cell cell-${s}`;
+                }
+            });
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
