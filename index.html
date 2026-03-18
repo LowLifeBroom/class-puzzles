@@ -213,6 +213,7 @@
                     <span class="bg-black text-white px-3 py-1 text-xs font-black uppercase tracking-widest">Case File</span>
                     <select id="case-selector" onchange="switchCase(this.value)" class="bg-white border-4 border-black text-lg font-black px-4 py-1 outline-none cursor-pointer">
                         <option value="case-tutorial">File 000: Deduction College</option>
+                        <option value="case-001">File 001: Murder at the Post Office</option>
                         <option value="case-art">File 003: Art of the Kill</option>
                     </select>
                 </div>
@@ -246,6 +247,13 @@
             <section class="bg-white border-4 border-black p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] relative">
                 <div class="absolute -top-4 left-6 bg-yellow-400 border-2 border-black px-4 py-1 font-black uppercase text-xs italic">Field Evidence</div>
                 <div id="clues-container" class="space-y-6 font-bold italic text-xl leading-relaxed text-slate-800"></div>
+            </section>
+
+            <!-- Statements (NEW) -->
+            <section id="statements-section" class="bg-stone-200 border-4 border-black p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] relative hidden">
+                <div class="absolute -top-4 left-6 bg-red-500 text-white border-2 border-black px-4 py-1 font-black uppercase text-xs italic">Suspect Statements</div>
+                <div id="statements-rule" class="font-black uppercase tracking-widest text-sm text-red-600 mb-4 border-b-2 border-red-300 pb-2"></div>
+                <div id="statements-container" class="space-y-4 font-mono text-sm md:text-base text-black"></div>
             </section>
 
             <!-- Verdict -->
@@ -288,6 +296,21 @@
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16M3 10h18"/></svg>`, 
                 info: "Incredibly talented at the most important skill for an attorney: getting paid.",
                 tags: ["6'0\"", "Right-handed", "Black Eyes", "Black Hair"]
+            },
+            "President Obsidian": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/><circle cx="10" cy="8" r="1.5"/><circle cx="14" cy="8" r="1.5"/><path d="M10 8h4"/></svg>`,
+                info: "The leader of Deduction College. She rules with an iron fist and a sharp mind.",
+                tags: ["5'7\"", "Right-handed", "Brown Eyes"]
+            },
+            "Dean Arches": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 4L4 8l8 4 8-4-8-4z"/><path d="M8 10v4c0 2 2 4 4 4s4-2 4-4v-4"/><path d="M20 8v6"/></svg>`,
+                info: "The dean of students. Always making sure the rules are followed, or else.",
+                tags: ["5'5\"", "Right-handed", "Green Eyes"]
+            },
+            "Lord Ivory": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/><circle cx="14" cy="8" r="1.5"/><path d="M10 11s1 1 2 1 2-1 2-1"/></svg>`,
+                info: "An aristocrat with a penchant for mysteries and monocles.",
+                tags: ["6'1\"", "Left-handed", "Blue Eyes"]
             },
 
             // LOCATIONS
@@ -352,6 +375,68 @@
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M19 4H5c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2h1v10c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V10h1c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z"/></svg>`, 
                 info: "Logico thought about how, technically, every vase someone makes by hand is rare.",
                 tags: ["Heavy-weight"]
+            },
+            "A Heavy Textbook": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V5H6.5A2.5 2.5 0 0 0 4 7.5v12z"/></svg>`,
+                info: "A massive volume covering the history of logical deductions and murder. Very heavy.",
+                tags: ["Heavy-weight", "Made of Paper"]
+            },
+            "A Fountain Pen": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2l4 18-4-2-4 2 4-18z"/><path d="M12 2v16"/></svg>`,
+                info: "An expensive, heavy fountain pen. The pen is mightier than the sword, especially when stabbed into a neck.",
+                tags: ["Light-weight", "Metal"]
+            },
+            "A Bloody Yardstick": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="4" rx="1"/><path d="M4 10v2M8 10v2M12 10v2M16 10v2M20 10v2"/></svg>`,
+                info: "Thirty-six inches of pure, unadulterated measurement. Now with a bit of blood.",
+                tags: ["Medium-weight", "Made of Wood"]
+            },
+            
+            // NEW FOR CASE 001
+            "Dr. Crimson": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M8 3v4c0 2.2 1.8 4 4 4s4-1.8 4-4V3"/><path d="M12 11v5"/><circle cx="12" cy="18" r="2"/><path d="M6 3h12"/></svg>`,
+                info: "She's the smartest doctor she's ever met, according to her, and she's probably right. Yeah, her diet is horrible, but if she has a heart attack, she'll operate on herself.",
+                tags: ["5'9\"", "Left-handed", "Green Eyes", "Red Hair", "Aquarius"]
+            },
+            "Mayor Honey": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M5 8h14M7 8v10a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V8"/><path d="M9 4h6v4H9z"/></svg>`,
+                info: "He knows where the bodies are buried, and he makes sure they always vote for him.",
+                tags: ["6'0\"", "Left-handed", "Hazel Eyes", "Light Brown Hair", "Scorpio"]
+            },
+            "General Coffee": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1M4 8h14v9a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8zM8 3v3M12 3v3M16 3v3"/></svg>`,
+                info: "An espresso connoisseur who prefers the smell of coffee to napalm in the morning.",
+                tags: ["6'0\"", "Right-handed", "Dark Brown Eyes", "Bald", "Sagittarius"]
+            },
+            "A Mail Truck": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M3 15h18v-5l-4-4H3v9z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>`,
+                info: "Practically indestructible, so it's great for joyrides, so long as you're not the one paying for gas.",
+                tags: ["Indoors"]
+            },
+            "The Long Line": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M4 12h16M4 8h16M4 16h16"/></svg>`,
+                info: "People standing in line, waiting to mail their letters.",
+                tags: ["Outdoors"]
+            },
+            "The Sorting Room": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>`,
+                info: "Where the postal workers sort the junk mail, bills, and catalogs using a great machine.",
+                tags: ["Indoors"]
+            },
+            "A Letter Opener": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M22 2l-6 6M16 8l-6 14-4-4 14-6z"/></svg>`,
+                info: "A sharp knife used by people who won't just rip their letters open.",
+                tags: ["Light-weight"]
+            },
+            "A Stamp Stamp": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M8 2h8v6H8zM10 8v8M6 16h12v6H6z"/></svg>`,
+                info: "A stamp for stamping over stamps.",
+                tags: ["Medium-weight"]
+            },
+            "A Heavy Package": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"/></svg>`,
+                info: "With a nice red ribbon that'll conceal blood stains.",
+                tags: ["Heavy-weight"]
             }
         };
 
@@ -370,6 +455,24 @@
                     "A poisoned apple was clearly used to commit the crime."
                 ],
                 solution: { who: "Captain Slate", what: "A Poisoned Apple", where: "The Library" }
+            },
+            "case-001": {
+                id: "case-001",
+                title: "File 001: Murder at the Post Office",
+                suspects: ["Dr. Crimson", "Mayor Honey", "General Coffee"],
+                locations: ["A Mail Truck", "The Long Line", "The Sorting Room"],
+                weapons: ["A Letter Opener", "A Stamp Stamp", "A Heavy Package"],
+                clues: [
+                    "Letter openers were not allowed in the sorting room, ever since \"the Incident,\" and that rule was not broken today.",
+                    "The suspect with the heavy package was self-conscious about their baldness and would prefer it not be mentioned in clues."
+                ],
+                statementRule: "(Remember: The murderer is lying. The others are telling the truth.)",
+                statements: [
+                    { suspect: "Dr. Crimson", text: "I brought a stamp stamp." },
+                    { suspect: "Mayor Honey", text: "Dr. Crimson was not in a mail truck." },
+                    { suspect: "General Coffee", text: "A letter opener was in a mail truck." }
+                ],
+                solution: { who: "Dr. Crimson", what: "A Stamp Stamp", where: "A Mail Truck" }
             },
             "case-art": {
                 id: "case-art",
@@ -416,6 +519,20 @@
             renderL('weapon-names', activeCase.weapons);
 
             document.getElementById('clues-container').innerHTML = activeCase.clues.map(clue => `<p class="border-l-4 border-black pl-4 py-2">${clue}</p>`).join('');
+
+            const statementsSec = document.getElementById('statements-section');
+            if (activeCase.statements && activeCase.statements.length > 0) {
+                statementsSec.classList.remove('hidden');
+                document.getElementById('statements-rule').innerText = activeCase.statementRule || "Statements:";
+                document.getElementById('statements-container').innerHTML = activeCase.statements.map(s => 
+                    `<div class="flex flex-col mb-3">
+                        <span class="font-black uppercase text-xs">${s.suspect}</span>
+                        <blockquote class="border-l-4 border-red-400 pl-4 py-2 italic bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">"${s.text}"</blockquote>
+                    </div>`
+                ).join('');
+            } else {
+                statementsSec.classList.add('hidden');
+            }
 
             const pop = (id, items, label) => {
                 const s = document.getElementById(id);
