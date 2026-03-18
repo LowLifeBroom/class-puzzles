@@ -21,21 +21,21 @@
             z-index: 50;
             align-items: center;
             justify-content: center;
-            padding: 0.5rem;
+            padding: 1rem;
         }
 
         .logic-grid-window {
             background: white;
             border: 6px solid black;
-            padding: 1rem;
+            padding: 1.5rem;
             width: fit-content;
             max-width: 98vw;
-            max-height: 95vh;
-            overflow: hidden;
+            max-height: 90vh;
             position: relative;
             box-shadow: 15px 15px 0px 0px rgba(0,0,0,1);
             display: flex;
             flex-direction: column;
+            margin-top: 20px;
         }
 
         .logic-table {
@@ -67,6 +67,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background-color 0.2s;
+        }
+        
+        .grid-cell:active {
+            background-color: #f3f4f6;
         }
 
         .corner-cell { background-color: #f3f4f6; }
@@ -112,7 +117,7 @@
             border: 4px solid white;
         }
 
-        #info-modal, #document-modal {
+        #info-modal, #document-modal, #custom-alert {
             display: none;
             position: fixed;
             inset: 0;
@@ -125,11 +130,28 @@
 
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #000; }
-        
-        /* Alert Modal specific style */
-        #custom-alert {
-            display: none;
+
+        .modal-close-btn {
+            position: absolute;
+            top: -24px;
+            right: -24px;
+            background: black;
+            color: white;
+            width: 48px;
+            height: 48px;
+            font-size: 32px;
+            font-weight: 900;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.1s;
+            z-index: 70;
+            border: 4px solid white;
         }
+        .modal-close-btn:hover { background-color: #1c1917; }
+        .modal-close-btn:active { transform: scale(0.9); }
     </style>
 </head>
 <body class="bg-stone-100 min-h-screen text-slate-900 overflow-x-hidden pb-24">
@@ -137,9 +159,12 @@
     <!-- Expanded Grid Popup -->
     <div id="grid-overlay" onclick="toggleGrid(false)">
         <div class="logic-grid-window" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center mb-4 pb-2 border-b-4 border-black">
+            <!-- Close Button moved inside relative container and positioned firmly -->
+            <button onclick="toggleGrid(false)" class="modal-close-btn">&times;</button>
+            
+            <div class="flex justify-between items-center mb-4 pb-2 border-b-4 border-black gap-4">
                 <h3 class="font-black uppercase tracking-tighter text-xl italic">LOGIC CROSS-MATRIX</h3>
-                <button onclick="toggleGrid(false)" class="bg-black text-white px-3 py-1 font-black text-xs uppercase hover:bg-stone-800">Close</button>
+                <button onclick="resetCurrentGrid()" class="text-[10px] bg-red-600 text-white font-black px-3 py-1 uppercase tracking-widest border-2 border-black hover:bg-red-700 active:translate-y-[2px] flex-shrink-0">Reset Case</button>
             </div>
             
             <div class="overflow-auto custom-scrollbar border-2 border-black">
@@ -151,13 +176,14 @@
                 <div class="flex flex-col items-center"><span class="text-amber-500 font-black text-xl">?</span><span class="text-[8px] font-black uppercase text-stone-400">MAYBE</span></div>
                 <div class="flex flex-col items-center"><span class="text-green-600 font-black text-xl">O</span><span class="text-[8px] font-black uppercase text-stone-400">YES</span></div>
             </div>
+            <p class="text-[8px] text-center mt-2 text-stone-400 font-bold uppercase italic">Long-press any cell to clear it</p>
         </div>
     </div>
 
-    <!-- General Info Modal (for Suspects, Weapons, Locations) -->
+    <!-- General Info Modal -->
     <div id="info-modal" onclick="closeModal(event)">
         <div class="bg-white border-[8px] border-black p-8 max-w-sm w-full relative shadow-[15px_15px_0px_0px_rgba(0,0,0,1)]" onclick="event.stopPropagation()">
-            <button onclick="document.getElementById('info-modal').style.display='none'" class="absolute -top-4 -right-4 bg-black text-white w-12 h-12 text-3xl font-black rounded-full hover:bg-stone-800">&times;</button>
+            <button onclick="document.getElementById('info-modal').style.display='none'" class="modal-close-btn">&times;</button>
             <div id="modal-content" class="text-center">
                 <div id="modal-icon" class="w-20 h-20 mx-auto mb-4 text-black"></div>
                 <h2 id="modal-title" class="text-2xl font-black uppercase italic mb-2 tracking-tighter border-b-4 border-black pb-1"></h2>
@@ -170,10 +196,10 @@
     <!-- Document Evidence Modal -->
     <div id="document-modal" onclick="closeDocumentModal(event)">
         <div class="bg-[#fdfbf7] border-[6px] border-black p-8 md:p-12 max-w-2xl w-full relative shadow-[15px_15px_0px_0px_rgba(0,0,0,1)] font-mono text-sm md:text-base text-black" onclick="event.stopPropagation()">
-            <button onclick="closeDocumentModal(event)" class="close-btn absolute -top-4 -right-4 bg-black text-white w-12 h-12 text-3xl font-black rounded-full flex items-center justify-center hover:bg-stone-800">&times;</button>
+            <button onclick="closeDocumentModal(event)" class="modal-close-btn">&times;</button>
             
             <svg viewBox="0 0 24 24" fill="currentColor" class="w-16 h-16 mx-auto mb-8">
-                <path d="M12 2L2 7l10 5 10-5-10-5zm0 7.5l-10-5v2.5l10 5 10-5v-2.5l-10 5zm0 5l-10-5v2.5l10 5 10-5v-2.5l-10 5z"/>
+                <path d="M12 2L2 7l10 5 10-5-10-5-10-5zm0 7.5l-10-5v2.5l10 5 10-5v-2.5l-10 5zm0 5l-10-5v2.5l10 5 10-5v-2.5l-10 5z"/>
             </svg>
 
             <p class="font-bold mb-6 leading-relaxed">
@@ -191,8 +217,8 @@
     </div>
 
     <!-- Custom Alert Modal -->
-    <div id="custom-alert" class="fixed inset-0 bg-black/80 z-[200] flex items-center justify-center p-4">
-        <div class="bg-white border-8 border-black p-8 max-w-md w-full shadow-[15px_15px_0px_0px_rgba(250,204,21,1)] text-center relative">
+    <div id="custom-alert">
+        <div class="bg-white border-8 border-black p-8 max-w-md w-full shadow-[15px_15px_0px_0px_rgba(250,204,21,1)] text-center relative" onclick="event.stopPropagation()">
             <h2 class="text-3xl font-black uppercase italic tracking-tighter mb-4 border-b-4 border-black pb-2">Bureau Notice</h2>
             <p id="alert-text" class="text-xl font-bold italic mb-6"></p>
             <button onclick="document.getElementById('custom-alert').style.display='none'" class="bg-black text-white px-8 py-3 font-black uppercase text-xl hover:bg-stone-800 w-full">Understood</button>
@@ -212,7 +238,6 @@
                 <div class="flex items-center gap-4">
                     <span class="bg-black text-white px-3 py-1 text-xs font-black uppercase tracking-widest">Case File</span>
                     <select id="case-selector" onchange="switchCase(this.value)" class="bg-white border-4 border-black text-lg font-black px-4 py-1 outline-none cursor-pointer">
-                        <!-- Options dynamically populated -->
                     </select>
                 </div>
             </div>
@@ -247,7 +272,7 @@
                 <div id="clues-container" class="space-y-6 font-bold italic text-xl leading-relaxed text-slate-800"></div>
             </section>
 
-            <!-- Statements (NEW) -->
+            <!-- Statements -->
             <section id="statements-section" class="bg-stone-200 border-4 border-black p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] relative hidden">
                 <div class="absolute -top-4 left-6 bg-red-500 text-white border-2 border-black px-4 py-1 font-black uppercase text-xs italic">Suspect Statements</div>
                 <div id="statements-rule" class="font-black uppercase tracking-widest text-sm text-red-600 mb-4 border-b-2 border-red-300 pb-2"></div>
@@ -269,218 +294,209 @@
 
     <script>
         const icons = {
-            // SUSPECTS
             "Mrs. Ruby": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`, 
-                info: "An international jewel thief, playgirl, and all-around charmer. She knows how to party... and kill! (But has she settled down?)",
+                info: "An international jewel thief, playgirl, and all-around charmer. She knows how to party... and kill!",
                 tags: ["5'6\"", "Right-handed", "Green Eyes", "Red Hair", "Libra"]
             },
             "Captain Slate": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/></svg>`, 
-                info: "A real-life astronaut. The first woman to travel around the dark side of the moon and also the first to be suspected of murdering her co-pilot.",
+                info: "A real-life astronaut. Suspected of murdering her co-pilot.",
                 tags: ["5'5\"", "Left-handed", "Brown Eyes", "Brown Hair", "Aquarius"]
             },
             "Vice President Mauve": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`, 
-                info: "Vice President of TekCo Futures. If she asks you to step into her metaverse, run away.",
+                info: "Vice President of TekCo Futures. Don't step into her metaverse.",
                 tags: ["5'8\"", "Right-handed", "Brown Eyes", "Black Hair", "Taurus"]
             },
             "Bishop Azure": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1 3-6z"/></svg>`, 
-                info: "A bishop in a local church, she has been known to pray for both her friends and her enemies. Of course, she asks for different things...",
+                info: "A bishop who prays for both her friends and her enemies.",
                 tags: ["5'4\"", "Right-handed", "Light Brown Eyes", "Dark Brown Hair"]
             },
             "Blackstone, Esq.": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16M3 10h18"/></svg>`, 
-                info: "Incredibly talented at the most important skill for an attorney: getting paid.",
+                info: "Incredibly talented at getting paid.",
                 tags: ["6'0\"", "Right-handed", "Black Eyes", "Black Hair"]
             },
             "President Obsidian": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/><circle cx="10" cy="8" r="1.5"/><circle cx="14" cy="8" r="1.5"/><path d="M10 8h4"/></svg>`,
-                info: "The leader of Deduction College. She rules with an iron fist and a sharp mind.",
+                info: "The leader of Deduction College. She rules with an iron fist.",
                 tags: ["5'7\"", "Right-handed", "Brown Eyes"]
             },
             "Dean Arches": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 4L4 8l8 4 8-4-8-4z"/><path d="M8 10v4c0 2 2 4 4 4s4-2 4-4v-4"/><path d="M20 8v6"/></svg>`,
-                info: "The dean of students. Always making sure the rules are followed, or else.",
+                info: "The dean of students. Follow the rules, or else.",
                 tags: ["5'5\"", "Right-handed", "Green Eyes"]
             },
             "Lord Ivory": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/><circle cx="14" cy="8" r="1.5"/><path d="M10 11s1 1 2 1 2-1 2-1"/></svg>`,
-                info: "An aristocrat with a penchant for mysteries and monocles.",
+                info: "An aristocrat with a penchant for mysteries.",
                 tags: ["6'1\"", "Left-handed", "Blue Eyes"]
             },
-
-            // LOCATIONS
             "The Library": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V5H6.5A2.5 2.5 0 0 0 4 7.5v12z"/></svg>`, 
-                info: "There are books on practically every subject in here, but mostly murder. No talking above a whisper or the librarian will stab you.",
+                info: "Books on practically every subject, mostly murder.",
                 tags: ["Indoors"]
             },
             "The Quad": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>`, 
-                info: "A grassy square where students relax, read, and contemplate who they'll murder next. Don't leave your frisbee here; it's a tripping hazard.",
+                info: "A grassy square where students relax and contemplate.",
                 tags: ["Outdoors"]
             },
             "The Science Lab": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2l4.5 9 4.5 9H3l4.5-9L12 2z"/></svg>`, 
-                info: "You can find all sorts of chemicals here. You could build a bomb. Or you could just use them to make a really cool volcano for the science fair.",
+                info: "Find all sorts of chemicals here.",
                 tags: ["Indoors"]
             },
             "The Rooftop Garden": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`, 
-                info: "A rooftop garden! With pigeons! And you can feed the pigeons! Very cool.",
+                info: "A rooftop garden with pigeons.",
                 tags: ["Outdoors"]
             },
             "The Entry Hall": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M3 21V3h18v18M3 7h18M9 21v-8h6v8"/></svg>`, 
-                info: "According to a plaque on the wall, even the architecture of the entry hall is art.",
+                info: "The architecture here is art.",
                 tags: ["Indoors"]
             },
             "An Art Studio": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10-4.48 10-10 10z"/></svg>`, 
-                info: "In the back of the museum, it's littered with flyers for art classes.",
+                info: "Littered with flyers for art classes.",
                 tags: ["Indoors"]
             },
-
-            // WEAPONS
             "A Yo-Yo": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>`, 
-                info: "It goes up, it goes down. And it can also go around a neck.",
-                tags: ["Light-weight", "Made of Plastic & Twine"]
+                info: "Goes up and down, or around a neck.",
+                tags: ["Light-weight"]
             },
             "A Poisoned Apple": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2s-2 2-2 4c0 3 2 5 2 5s2-2 2-5c0-2-2-4-2-4z"/><circle cx="12" cy="14" r="8"/></svg>`, 
-                info: "If you're a teacher and you get an apple, ask yourself if the student wants you dead.",
-                tags: ["Medium-weight", "Made of Apple & Toxins"]
+                info: "Ask yourself if the student wants you dead.",
+                tags: ["Medium-weight"]
             },
             "A Human Skull": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2C7.58 2 4 5.58 4 10c0 4.42 3 8 3 8l1 4h8l1-4s3-3.58 3-8c0-4.42-3.58-8-8-8z"/><circle cx="9" cy="10" r="1"/><circle cx="15" cy="10" r="1"/><path d="M10 16h4"/></svg>`, 
-                info: "\"Alas, poor Yorick, I knew him. And now I'm swinging his skull at people.\"",
-                tags: ["Medium-weight", "Made of Bone"]
+                info: "A classic medium-weight weapon.",
+                tags: ["Medium-weight"]
             },
             "A Glass of Poisoned Wine": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M15 2H9v2h6V2zM12 11c-2.21 0-4-1.79-4-4h8c0 2.21-1.79 4-4 4zm1 1h-2v7h-2v2h6v-2h-2v-7z"/></svg>`, 
-                info: "This is your typical glass of poisoned wine. A mystery classic.",
+                info: "A mystery classic.",
                 tags: ["Light-weight"]
             },
             "An Abstract Statue": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2l-8 16h16L12 2z"/></svg>`, 
-                info: "No matter how hard he looked at this, Logico did not understand.",
+                info: "A heavy, confusing sculpture.",
                 tags: ["Heavy-weight"]
             },
             "A Rare Vase": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M19 4H5c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2h1v10c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V10h1c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z"/></svg>`, 
-                info: "Logico thought about how, technically, every vase someone makes by hand is rare.",
+                info: "Technically, every vase is rare.",
                 tags: ["Heavy-weight"]
             },
             "A Heavy Textbook": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V5H6.5A2.5 2.5 0 0 0 4 7.5v12z"/></svg>`,
-                info: "A massive volume covering the history of logical deductions and murder. Very heavy.",
-                tags: ["Heavy-weight", "Made of Paper"]
+                info: "Massive volume covering the history of murder.",
+                tags: ["Heavy-weight"]
             },
             "A Fountain Pen": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2l4 18-4-2-4 2 4-18z"/><path d="M12 2v16"/></svg>`,
-                info: "An expensive, heavy fountain pen. The pen is mightier than the sword, especially when stabbed into a neck.",
-                tags: ["Light-weight", "Metal"]
+                info: "Mightier than the sword.",
+                tags: ["Light-weight"]
             },
             "A Bloody Yardstick": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="4" rx="1"/><path d="M4 10v2M8 10v2M12 10v2M16 10v2M20 10v2"/></svg>`,
-                info: "Thirty-six inches of pure, unadulterated measurement. Now with a bit of blood.",
-                tags: ["Medium-weight", "Made of Wood"]
+                info: "Thirty-six inches of pure measurement.",
+                tags: ["Medium-weight"]
             },
-            
-            // NEW FOR CASE 001
             "Dr. Crimson": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M8 3v4c0 2.2 1.8 4 4 4s4-1.8 4-4V3"/><path d="M12 11v5"/><circle cx="12" cy="18" r="2"/><path d="M6 3h12"/></svg>`,
-                info: "She's the smartest doctor she's ever met, according to her, and she's probably right. Yeah, her diet is horrible, but if she has a heart attack, she'll operate on herself.",
-                tags: ["5'9\"", "Left-handed", "Green Eyes", "Red Hair", "Aquarius"]
+                info: "The smartest doctor around.",
+                tags: ["5'9\"", "Left-handed"]
             },
             "Mayor Honey": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M5 8h14M7 8v10a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V8"/><path d="M9 4h6v4H9z"/></svg>`,
-                info: "He knows where the bodies are buried, and he makes sure they always vote for him.",
-                tags: ["6'0\"", "Left-handed", "Hazel Eyes", "Light Brown Hair", "Scorpio"]
+                info: "He knows where the bodies are buried.",
+                tags: ["6'0\"", "Left-handed"]
             },
             "General Coffee": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1M4 8h14v9a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8zM8 3v3M12 3v3M16 3v3"/></svg>`,
-                info: "An espresso connoisseur who prefers the smell of coffee to napalm in the morning.",
-                tags: ["6'0\"", "Right-handed", "Dark Brown Eyes", "Bald", "Sagittarius"]
+                info: "An espresso connoisseur.",
+                tags: ["6'0\"", "Right-handed"]
             },
             "A Mail Truck": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M3 15h18v-5l-4-4H3v9z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>`,
-                info: "Practically indestructible, so it's great for joyrides, so long as you're not the one paying for gas.",
+                info: "Indestructible and great for joyrides.",
                 tags: ["Indoors"]
             },
             "The Long Line": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M4 12h16M4 8h16M4 16h16"/></svg>`,
-                info: "People standing in line, waiting to mail their letters.",
+                info: "Waiting to mail letters.",
                 tags: ["Outdoors"]
             },
             "The Sorting Room": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>`,
-                info: "Where the postal workers sort the junk mail, bills, and catalogs using a great machine.",
+                info: "Where postal workers sort the junk mail.",
                 tags: ["Indoors"]
             },
             "A Letter Opener": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M22 2l-6 6M16 8l-6 14-4-4 14-6z"/></svg>`,
-                info: "A sharp knife used by people who won't just rip their letters open.",
+                info: "A sharp knife.",
                 tags: ["Light-weight"]
             },
             "A Stamp Stamp": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M8 2h8v6H8zM10 8v8M6 16h12v6H6z"/></svg>`,
-                info: "A stamp for stamping over stamps.",
+                info: "For stamping over stamps.",
                 tags: ["Medium-weight"]
             },
             "A Heavy Package": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"/></svg>`,
-                info: "With a nice red ribbon that'll conceal blood stains.",
+                info: "With a red ribbon.",
                 tags: ["Heavy-weight"]
             },
-
-            // NEW FOR CASE 002
             "The Amazing Aureolin": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M6 10h12v10H6zM8 4h8v6H8z"/><path d="M4 20h16v2H4z"/></svg>`,
-                info: "A magician who perfected the sawing-your-husband-in-two routine. Then, she made his body disappear.",
-                tags: ["5'6\"", "Left-handed", "Green Eyes", "Blond Hair"]
+                info: "A magician who perfected sawing-your-husband-in-two.",
+                tags: ["5'6\"", "Left-handed"]
             },
             "Midnight III": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><circle cx="7" cy="14" r="3"/><circle cx="17" cy="14" r="3"/><path d="M2 14h2M10 14h4M20 14h2M5 11l2 3M19 11l-2 3"/></svg>`,
-                info: "The grandson of the founder of Midnight Movies and a self-described self-made man.",
-                tags: ["5'8\"", "Left-handed", "Dark Brown Eyes", "Dark Brown Hair"]
+                info: "Grandson of Midnight Movies founder.",
+                tags: ["5'8\"", "Left-handed"]
             },
             "Dame Obsidian": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 4c-3.3 0-6 2.7-6 6v2H4v2h16v-2h-2v-2c0-3.3-2.7-6-6-6zM8 12h8"/><circle cx="15" cy="11" r="1.5"/></svg>`,
-                info: "A mystery writer whose books have sold more copies than the Bible and Shakespeare combined.",
-                tags: ["5'4\"", "Left-handed", "Green Eyes", "Black Hair"]
+                info: "Mystery writer extra-ordinaire.",
+                tags: ["5'4\"", "Left-handed"]
             },
             "The Enormous Bathroom": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M4 12v5a3 3 0 003 3h10a3 3 0 003-3v-5H4zM16 12v-4a2 2 0 00-2-2h-4a2 2 0 00-2 2v4M9 5v3"/></svg>`,
-                info: "A bathroom that is bigger than Deductive Logico's house.",
+                info: "Bigger than Logico's house.",
                 tags: ["Indoors"]
             },
             "The Bedroom": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M4 11v9M20 11v9M4 15h16M5 11h14v-4a2 2 0 00-2-2H7a2 2 0 00-2 2v4zM8 9h8"/></svg>`,
-                info: "A California king-sized bed, unmade, stands in a spotless white room.",
+                info: "California king-sized bed.",
                 tags: ["Indoors"]
             },
             "The Screening Room": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3V9z"/></svg>`,
-                info: "Red velvet seats and a popcorn machine make this the ultimate screening experience.",
+                info: "Red velvet seats.",
                 tags: ["Indoors"]
             },
             "A Fork": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M9 2v6c0 1.7 1.3 3 3 3s3-1.3 3-3V2M12 11v11M9 2h1M14 2h1M12 2v6"/></svg>`,
-                info: "Actually a lot more gruesome than a knife, if you think about it.",
+                info: "Gruesome when you think about it.",
                 tags: ["Light-weight"]
             },
             "An Aluminum Pipe": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="18" rx="1"/><path d="M9 6h6M9 18h6"/></svg>`,
-                info: "Safer than lead, unless it hits you in the head.",
+                info: "Safer than lead.",
                 tags: ["Medium-weight"]
             },
             "A Heavy Candle": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="9" y="10" width="6" height="12" rx="1"/><path d="M12 10V6c0-2 2-3 2-3s-3 1-3 3v4M10 10h4"/></svg>`,
-                info: "Heavy enough to kill, and yet it lightens the room.",
+                info: "Heavy enough to kill.",
                 tags: ["Medium-weight"]
             }
         };
@@ -495,7 +511,7 @@
                 clues: [
                     "A yo-yo was not in the library.",
                     "Mrs. Ruby was in a place coincidentally referenced in Dame Obsidian's famous 'unauthorized autobiography' <button onclick='openDocumentModal()' class='inline-block align-middle ml-2 bg-yellow-300 text-black border-2 border-black px-2 py-1 text-xs font-black uppercase tracking-widest hover:bg-yellow-400 active:translate-y-[2px] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer'>[View Excerpt]</button>.",
-                    "A messenger from The Blessed Denomination of the Green Goblet gave Logico a note that read: ECIV TNEDISERP EVUAM DAH A NAMUH LLUKS (Vice President Mauve had a human skull).",
+                    "A messenger gave Logico a note: ECIV TNEDISERP EVUAM DAH A NAMUH LLUKS (Vice President Mauve had a human skull).",
                     "Captain Slate had never been on the quad.",
                     "A poisoned apple was clearly used to commit the crime."
                 ],
@@ -508,10 +524,10 @@
                 locations: ["A Mail Truck", "The Long Line", "The Sorting Room"],
                 weapons: ["A Letter Opener", "A Stamp Stamp", "A Heavy Package"],
                 clues: [
-                    "Letter openers were not allowed in the sorting room, ever since \"the Incident,\" and that rule was not broken today.",
-                    "The suspect with the heavy package was self-conscious about their baldness and would prefer it not be mentioned in clues."
+                    "Letter openers were not allowed in the sorting room, and that rule was not broken today.",
+                    "The suspect with the heavy package was self-conscious about their baldness."
                 ],
-                statementRule: "(Remember: The murderer is lying. The others are telling the truth.)",
+                statementRule: "(The murderer is lying. The others are telling the truth.)",
                 statements: [
                     { suspect: "Dr. Crimson", text: "I brought a stamp stamp." },
                     { suspect: "Mayor Honey", text: "Dr. Crimson was not in a mail truck." },
@@ -527,7 +543,7 @@
                 weapons: ["A Fork", "An Aluminum Pipe", "A Heavy Candle"],
                 clues: [
                     "The Amazing Aureolin trusted the suspect who brought a fork.",
-                    "Midnight III was still brandishing an aluminum pipe when Logico arrived.",
+                    "Midnight III was still brandishing an aluminum pipe.",
                     "A heavy candle was not found in the bedroom.",
                     "Dame Obsidian was found hiding beneath red velvet seats.",
                     "The body was found inside a marble tub."
@@ -544,25 +560,20 @@
                     "Blackstone, Esq., was suspicious of the person who brought an abstract statue.",
                     "Captain Slate brought a glass of poisoned wine.",
                     "An abstract statue was not in the art studio.",
-                    "Either Blackstone, Esq., was standing on top of flyers for art classes, or Captain Slate was in the rooftop garden.",
-                    "The body of the experimental artist was found under a plaque on the wall."
+                    "Either Blackstone, Esq., was standing on art class flyers, or Captain Slate was in the rooftop garden.",
+                    "The body was found under a plaque on the wall."
                 ],
                 solution: { who: "Captain Slate", what: "A Glass of Poisoned Wine", where: "The Entry Hall" }
             }
         };
 
         let currentCaseId = "case-tutorial";
+        let longPressTimer;
 
-        function getSolvedCases() {
-            return JSON.parse(localStorage.getItem('murdle_solved_cases') || '[]');
-        }
-
+        function getSolvedCases() { return JSON.parse(localStorage.getItem('murdle_solved_cases') || '[]'); }
         function saveSolvedCase(id) {
             const solved = getSolvedCases();
-            if (!solved.includes(id)) {
-                solved.push(id);
-                localStorage.setItem('murdle_solved_cases', JSON.stringify(solved));
-            }
+            if (!solved.includes(id)) { solved.push(id); localStorage.setItem('murdle_solved_cases', JSON.stringify(solved)); }
         }
 
         function populateCaseSelector() {
@@ -586,11 +597,7 @@
             renderCase();
         }
 
-        function switchCase(id) {
-            currentCaseId = id;
-            populateCaseSelector();
-            renderCase();
-        }
+        function switchCase(id) { currentCaseId = id; populateCaseSelector(); renderCase(); }
 
         function renderCase() {
             const activeCase = cases[currentCaseId];
@@ -618,9 +625,7 @@
                         <blockquote class="border-l-4 border-red-400 pl-4 py-2 italic bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">"${s.text}"</blockquote>
                     </div>`
                 ).join('');
-            } else {
-                statementsSec.classList.add('hidden');
-            }
+            } else { statementsSec.classList.add('hidden'); }
 
             const pop = (id, items, label) => {
                 const s = document.getElementById(id);
@@ -703,21 +708,61 @@
             cell.className = "grid-cell";
             cell.dataset.state = "empty";
             cell.id = `${currentCaseId}-cell-${id}`;
+
+            const updateCell = (nextState) => {
+                cell.dataset.state = nextState;
+                cell.innerHTML = nextState === 'empty' ? '' : (nextState === 'x' ? 'X' : (nextState === 'maybe' ? '?' : 'O'));
+                cell.className = `grid-cell cell-${nextState}`;
+                saveState();
+            };
+
+            // Click to cycle states
             cell.onclick = () => {
                 const states = ['empty', 'x', 'maybe', 'o'];
                 const next = states[(states.indexOf(cell.dataset.state) + 1) % states.length];
-                cell.dataset.state = next;
-                cell.innerHTML = next === 'empty' ? '' : (next === 'x' ? 'X' : (next === 'maybe' ? '?' : 'O'));
-                cell.className = `grid-cell cell-${next}`;
-                saveState();
+                updateCell(next);
             };
+
+            // Long press to clear cell
+            const startPress = () => {
+                longPressTimer = setTimeout(() => {
+                    updateCell('empty');
+                    // Prevent cycle click firing after clear
+                    const oldOnClick = cell.onclick;
+                    cell.onclick = null;
+                    setTimeout(() => cell.onclick = oldOnClick, 100);
+                }, 500);
+            };
+
+            const endPress = () => clearTimeout(longPressTimer);
+
+            cell.addEventListener('mousedown', startPress);
+            cell.addEventListener('mouseup', endPress);
+            cell.addEventListener('mouseleave', endPress);
+            cell.addEventListener('touchstart', startPress);
+            cell.addEventListener('touchend', endPress);
+
             td.appendChild(cell);
             return td;
         }
 
+        function resetCurrentGrid() {
+            if (confirm("Clear all data in this grid?")) {
+                const grid = JSON.parse(localStorage.getItem(`murdle_matrix_v5`) || '{}');
+                document.querySelectorAll('.grid-cell').forEach(cell => {
+                    if (cell.id.startsWith(currentCaseId)) {
+                        cell.dataset.state = "empty";
+                        cell.innerHTML = "";
+                        cell.className = "grid-cell";
+                        grid[cell.id] = "empty";
+                    }
+                });
+                localStorage.setItem(`murdle_matrix_v5`, JSON.stringify(grid));
+            }
+        }
+
         function toggleGrid(show) { document.getElementById('grid-overlay').style.display = show ? 'flex' : 'none'; }
 
-        // General info modal (suspects, weapons, locations)
         function openModal(item) {
             const data = icons[item];
             if (!data) return;
@@ -725,21 +770,14 @@
             document.getElementById('modal-title').innerText = item;
             document.getElementById('modal-body').innerText = data.info;
             const tagsCont = document.getElementById('modal-tags');
-            tagsCont.innerHTML = (data.tags || []).map(t => `
-                <span class="bg-stone-100 border border-black px-2 py-0.5 text-[10px] font-black uppercase tracking-tight">${t}</span>
-            `).join('');
+            tagsCont.innerHTML = (data.tags || []).map(t => `<span class="bg-stone-100 border border-black px-2 py-0.5 text-[10px] font-black uppercase tracking-tight">${t}</span>`).join('');
             document.getElementById('info-modal').style.display = 'flex';
         }
 
         function closeModal(e) { if (e.target.id === 'info-modal') document.getElementById('info-modal').style.display = 'none'; }
-
-        // Document specific modal logic
-        function openDocumentModal() {
-            document.getElementById('document-modal').style.display = 'flex';
-        }
-
+        function openDocumentModal() { document.getElementById('document-modal').style.display = 'flex'; }
         function closeDocumentModal(e) { 
-            if (!e || e.target.id === 'document-modal' || e.target.closest('.close-btn')) {
+            if (!e || e.target.id === 'document-modal' || e.target.closest('.modal-close-btn')) {
                 document.getElementById('document-modal').style.display = 'none'; 
             }
         }
@@ -757,7 +795,7 @@
                 populateCaseSelector();
                 renderCase();
             } else { alertText.innerText = "INCORRECT. Your deduction does not match the evidence."; }
-            document.getElementById('custom-alert').style.display = 'block';
+            document.getElementById('custom-alert').style.display = 'flex';
         }
 
         function saveState() {
