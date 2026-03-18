@@ -212,9 +212,7 @@
                 <div class="flex items-center gap-4">
                     <span class="bg-black text-white px-3 py-1 text-xs font-black uppercase tracking-widest">Case File</span>
                     <select id="case-selector" onchange="switchCase(this.value)" class="bg-white border-4 border-black text-lg font-black px-4 py-1 outline-none cursor-pointer">
-                        <option value="case-tutorial">File 000: Deduction College</option>
-                        <option value="case-001">File 001: Murder at the Post Office</option>
-                        <option value="case-art">File 003: Art of the Kill</option>
+                        <!-- Options dynamically populated -->
                     </select>
                 </div>
             </div>
@@ -264,7 +262,7 @@
                     <select id="solve-what" class="bg-white text-black font-black p-3 border-4 border-black outline-none italic"></select>
                     <select id="solve-where" class="bg-white text-black font-black p-3 border-4 border-black outline-none italic"></select>
                 </div>
-                <button onclick="checkSolution()" class="w-full mt-8 bg-yellow-400 text-black py-4 font-black uppercase text-2xl hover:bg-yellow-300 transition-colors">Submit Findings</button>
+                <button id="submit-btn" onclick="checkSolution()" class="w-full mt-8 bg-yellow-400 text-black py-4 font-black uppercase text-2xl hover:bg-yellow-300 transition-colors">Submit Findings</button>
             </section>
         </main>
     </div>
@@ -443,7 +441,7 @@
         const cases = {
             "case-tutorial": {
                 id: "case-tutorial",
-                title: "Deduction College",
+                title: "File 000: Deduction College",
                 suspects: ["Mrs. Ruby", "Captain Slate", "Vice President Mauve"],
                 locations: ["The Library", "The Quad", "The Science Lab"],
                 weapons: ["A Yo-Yo", "A Poisoned Apple", "A Human Skull"],
@@ -476,7 +474,7 @@
             },
             "case-art": {
                 id: "case-art",
-                title: "Art of the Kill",
+                title: "File 003: Art of the Kill",
                 suspects: ["Captain Slate", "Bishop Azure", "Blackstone, Esq."],
                 locations: ["The Rooftop Garden", "The Entry Hall", "An Art Studio"],
                 weapons: ["A Glass of Poisoned Wine", "An Abstract Statue", "A Rare Vase"],
@@ -493,14 +491,42 @@
 
         let currentCaseId = "case-tutorial";
 
+        function getSolvedCases() {
+            return JSON.parse(localStorage.getItem('murdle_solved_cases') || '[]');
+        }
+
+        function saveSolvedCase(id) {
+            const solved = getSolvedCases();
+            if (!solved.includes(id)) {
+                solved.push(id);
+                localStorage.setItem('murdle_solved_cases', JSON.stringify(solved));
+            }
+        }
+
+        function populateCaseSelector() {
+            const selector = document.getElementById('case-selector');
+            const solved = getSolvedCases();
+            selector.innerHTML = '';
+            Object.values(cases).forEach(c => {
+                const isSolved = solved.includes(c.id);
+                const option = document.createElement('option');
+                option.value = c.id;
+                option.text = (isSolved ? '✓ ' : '') + c.title;
+                if (c.id === currentCaseId) option.selected = true;
+                selector.appendChild(option);
+            });
+        }
+
         function init() {
             const today = new Date();
             document.getElementById('date-display').innerText = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
+            populateCaseSelector();
             renderCase();
         }
 
         function switchCase(id) {
             currentCaseId = id;
+            populateCaseSelector();
             renderCase();
         }
 
@@ -541,6 +567,16 @@
             pop('solve-who', activeCase.suspects, 'WHO');
             pop('solve-what', activeCase.weapons, 'WHAT');
             pop('solve-where', activeCase.locations, 'WHERE');
+
+            const solved = getSolvedCases();
+            const submitBtn = document.getElementById('submit-btn');
+            if (solved.includes(currentCaseId)) {
+                submitBtn.innerText = "✓ CASE CLOSED";
+                submitBtn.className = "w-full mt-8 bg-green-500 text-white py-4 font-black uppercase text-2xl hover:bg-green-400 transition-colors";
+            } else {
+                submitBtn.innerText = "Submit Findings";
+                submitBtn.className = "w-full mt-8 bg-yellow-400 text-black py-4 font-black uppercase text-2xl hover:bg-yellow-300 transition-colors";
+            }
 
             createMatrix();
             loadState();
@@ -655,6 +691,9 @@
             if (!who || !what || !where) { alertText.innerText = "The Bureau requires all three variables."; } 
             else if (who === activeCase.solution.who && what === activeCase.solution.what && where === activeCase.solution.where) {
                 alertText.innerText = `CORRECT! ${who} committed the crime in ${where} with ${what}.`;
+                saveSolvedCase(currentCaseId);
+                populateCaseSelector();
+                renderCase();
             } else { alertText.innerText = "INCORRECT. Your deduction does not match the evidence."; }
             document.getElementById('custom-alert').style.display = 'block';
         }
