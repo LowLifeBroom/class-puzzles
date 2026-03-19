@@ -33,7 +33,7 @@
             max-height: 95vh;
             overflow: hidden;
             position: relative;
-            box-shadow: 15px 15px 0px 0px rgba(0,0,0,1);
+            box-shadow: 15px 15px 0px 0px rgba(251,191,36,1);
             display: flex;
             flex-direction: column;
         }
@@ -112,7 +112,7 @@
             border: 4px solid white;
         }
 
-        #info-modal, #document-modal {
+        #info-modal, #document-modal, #decoder-modal {
             display: none;
             position: fixed;
             inset: 0;
@@ -126,7 +126,6 @@
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #000; }
         
-        /* Alert Modal specific style */
         #custom-alert {
             display: none;
         }
@@ -139,7 +138,7 @@
         <div class="logic-grid-window" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-4 pb-2 border-b-4 border-black">
                 <h3 class="font-black uppercase tracking-tighter text-xl italic">LOGIC CROSS-MATRIX</h3>
-                <button onclick="toggleGrid(false)" class="bg-black text-white px-3 py-1 font-black text-xs uppercase hover:bg-stone-800">Close</button>
+                <button onclick="toggleGrid(false)" class="bg-red-600 text-white w-8 h-8 flex items-center justify-center font-black text-xl rounded-full border-2 border-black hover:bg-red-700">&times;</button>
             </div>
             
             <div class="overflow-auto custom-scrollbar border-2 border-black">
@@ -156,8 +155,8 @@
 
     <!-- General Info Modal (for Suspects, Weapons, Locations) -->
     <div id="info-modal" onclick="closeModal(event)">
-        <div class="bg-white border-[8px] border-black p-8 max-w-sm w-full relative shadow-[15px_15px_0px_0px_rgba(0,0,0,1)]" onclick="event.stopPropagation()">
-            <button onclick="document.getElementById('info-modal').style.display='none'" class="absolute -top-4 -right-4 bg-black text-white w-12 h-12 text-3xl font-black rounded-full hover:bg-stone-800">&times;</button>
+        <div class="bg-white border-[8px] border-black p-8 max-w-sm w-full relative shadow-[15px_15px_0px_0px_rgba(251,191,36,1)]" onclick="event.stopPropagation()">
+            <button onclick="document.getElementById('info-modal').style.display='none'" class="absolute -top-4 -right-4 bg-red-600 text-white w-12 h-12 text-3xl font-black rounded-full flex items-center justify-center border-2 border-black hover:bg-red-700">&times;</button>
             <div id="modal-content" class="text-center">
                 <div id="modal-icon" class="w-20 h-20 mx-auto mb-4 text-black"></div>
                 <h2 id="modal-title" class="text-2xl font-black uppercase italic mb-2 tracking-tighter border-b-4 border-black pb-1"></h2>
@@ -167,20 +166,55 @@
         </div>
     </div>
 
+    <!-- Decoder Ring Modal -->
+    <div id="decoder-modal" onclick="closeDecoderModal(event)">
+        <div class="bg-stone-100 border-[4px] sm:border-[8px] border-black p-4 sm:p-6 max-w-lg w-full relative shadow-[8px_8px_0px_0px_rgba(251,191,36,1)] sm:shadow-[12px_12px_0px_0px_rgba(251,191,36,1)] max-h-[90vh] overflow-y-auto custom-scrollbar" onclick="event.stopPropagation()">
+            <button onclick="closeDecoderModal()" class="absolute top-2 right-2 sm:top-4 sm:right-4 bg-red-600 text-white w-8 h-8 sm:w-10 sm:h-10 text-xl sm:text-2xl font-black rounded-full flex items-center justify-center border-2 border-black hover:bg-red-700 z-10">&times;</button>
+            <h2 class="text-xl sm:text-2xl font-black uppercase italic mb-3 sm:mb-4 border-b-4 border-black pb-2 text-center tracking-tighter pr-8 sm:pr-10">Secret Decoder Ring</h2>
+            
+            <div class="mb-3 sm:mb-4 bg-black text-white p-2 sm:p-3 font-mono text-[9px] sm:text-xs space-y-1 sm:space-y-2">
+                <p class="border-b border-stone-700 pb-1 break-words">DECODED: ABCDEFGHIJKLMNOPQRSTUVWXYZ</p>
+                <p class="break-words">ENCODED: ZYXWVUTSRQPONMLKJIHGFEDCBA</p>
+            </div>
+
+            <div class="space-y-2 sm:space-y-3">
+                <input type="hidden" id="cipher-input">
+                <div>
+                    <label class="block text-[10px] font-black uppercase mb-1">Encrypted Message</label>
+                    <div id="cipher-display" class="w-full border-4 border-black p-2 font-mono font-bold uppercase bg-white text-xs sm:text-sm break-words min-h-[2.5rem]"></div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black uppercase mb-1 text-red-600">Decoded Output</label>
+                    <div id="cipher-output" class="w-full border-4 border-black p-2 font-mono font-black text-base sm:text-lg uppercase bg-stone-200 flex items-center justify-center text-center break-words min-h-[2.5rem]"></div>
+                </div>
+                
+                <!-- New Mirror Transformation Buttons -->
+                <div class="grid grid-cols-2 gap-2 sm:gap-3 pt-1">
+                    <button onclick="mirrorWords()" class="bg-stone-800 text-white py-2 px-2 font-black uppercase text-[9px] sm:text-[10px] tracking-widest border-4 border-black hover:bg-stone-700 active:translate-y-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] sm:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all">
+                        Mirror Words
+                    </button>
+                    <button onclick="mirrorFullMessage()" class="bg-stone-800 text-white py-2 px-2 font-black uppercase text-[9px] sm:text-[10px] tracking-widest border-4 border-black hover:bg-stone-700 active:translate-y-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] sm:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all">
+                        Mirror Message
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Document Evidence Modal -->
     <div id="document-modal" onclick="closeDocumentModal(event)">
-        <div class="bg-[#fdfbf7] border-[6px] border-black p-8 md:p-12 max-w-2xl w-full relative shadow-[15px_15px_0px_0px_rgba(0,0,0,1)] font-mono text-sm md:text-base text-black" onclick="event.stopPropagation()">
-            <button onclick="closeDocumentModal(event)" class="close-btn absolute -top-4 -right-4 bg-black text-white w-12 h-12 text-3xl font-black rounded-full flex items-center justify-center hover:bg-stone-800">&times;</button>
+        <div class="bg-[#fdfbf7] border-[6px] border-black p-6 md:p-8 max-w-xl w-full relative shadow-[15px_15px_0px_0px_rgba(251,191,36,1)] font-mono text-sm md:text-base text-black" onclick="event.stopPropagation()">
+            <button onclick="closeDocumentModal(event)" class="close-btn absolute -top-4 -right-4 bg-red-600 text-white w-12 h-12 text-3xl font-black rounded-full flex items-center justify-center border-2 border-black hover:bg-red-700">&times;</button>
             
-            <svg viewBox="0 0 24 24" fill="currentColor" class="w-16 h-16 mx-auto mb-8">
+            <svg viewBox="0 0 24 24" fill="currentColor" class="w-12 h-12 mx-auto mb-4">
                 <path d="M12 2L2 7l10 5 10-5-10-5zm0 7.5l-10-5v2.5l10 5 10-5v-2.5l-10 5zm0 5l-10-5v2.5l10 5 10-5v-2.5l-10 5z"/>
             </svg>
 
-            <p class="font-bold mb-6 leading-relaxed">
+            <p class="font-bold mb-4 leading-relaxed">
                 The following excerpt is from page 89 of <i class="italic font-bold">How I Murdered My Husband: An Idunnit</i>, by Dame Obsidian:
             </p>
             
-            <blockquote class="pl-8 mb-6 italic leading-loose text-slate-800 text-[15px] md:text-lg tracking-wide">
+            <blockquote class="pl-6 mb-4 italic leading-relaxed text-slate-800 text-[14px] md:text-[15px] tracking-wide">
                 At the time, I was struggling with my latest whodunit, The Terrifying Tale of the Beautiful Bride. I heard footsteps in the student union. It felt like an ordinary, normal day, but of course, it wasn't.
             </blockquote>
             
@@ -192,7 +226,7 @@
 
     <!-- Custom Alert Modal -->
     <div id="custom-alert" class="fixed inset-0 bg-black/80 z-[200] flex items-center justify-center p-4">
-        <div class="bg-white border-8 border-black p-8 max-w-md w-full shadow-[15px_15px_0px_0px_rgba(250,204,21,1)] text-center relative">
+        <div class="bg-white border-8 border-black p-8 max-w-md w-full shadow-[15px_15px_0px_0px_rgba(251,191,36,1)] text-center relative">
             <h2 class="text-3xl font-black uppercase italic tracking-tighter mb-4 border-b-4 border-black pb-2">Bureau Notice</h2>
             <p id="alert-text" class="text-xl font-bold italic mb-6"></p>
             <button onclick="document.getElementById('custom-alert').style.display='none'" class="bg-black text-white px-8 py-3 font-black uppercase text-xl hover:bg-stone-800 w-full">Understood</button>
@@ -212,7 +246,6 @@
                 <div class="flex items-center gap-4">
                     <span class="bg-black text-white px-3 py-1 text-xs font-black uppercase tracking-widest">Case File</span>
                     <select id="case-selector" onchange="switchCase(this.value)" class="bg-white border-4 border-black text-lg font-black px-4 py-1 outline-none cursor-pointer">
-                        <!-- Options dynamically populated -->
                     </select>
                 </div>
             </div>
@@ -224,7 +257,9 @@
         <main class="space-y-12">
             <!-- Dossier -->
             <section>
-                <h2 class="bg-black text-white px-4 py-1 inline-block font-black uppercase text-sm tracking-widest mb-6 italic">Classified Dossier</h2>
+                <div class="mb-6">
+                    <h2 class="bg-black text-white px-4 py-1 inline-block font-black uppercase text-sm tracking-widest italic">Classified Dossier</h2>
+                </div>
                 <div id="dossier-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="bg-white p-4 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
                         <h3 class="font-black border-b-2 border-black mb-2 uppercase text-[10px] text-slate-500">Suspects</h3>
@@ -238,6 +273,11 @@
                         <h3 class="font-black border-b-2 border-black mb-2 uppercase text-[10px] text-slate-500">Weapons</h3>
                         <ul class="space-y-2" id="weapon-names"></ul>
                     </div>
+                    <!-- Future-proofing: Motives Column (Hidden if empty) -->
+                    <div id="motives-container" class="bg-white p-4 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hidden">
+                        <h3 class="font-black border-b-2 border-black mb-2 uppercase text-[10px] text-slate-500">Motives</h3>
+                        <ul class="space-y-2" id="motive-names"></ul>
+                    </div>
                 </div>
             </section>
 
@@ -247,7 +287,7 @@
                 <div id="clues-container" class="space-y-6 font-bold italic text-xl leading-relaxed text-slate-800"></div>
             </section>
 
-            <!-- Statements (NEW) -->
+            <!-- Statements -->
             <section id="statements-section" class="bg-stone-200 border-4 border-black p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] relative hidden">
                 <div class="absolute -top-4 left-6 bg-red-500 text-white border-2 border-black px-4 py-1 font-black uppercase text-xs italic">Suspect Statements</div>
                 <div id="statements-rule" class="font-black uppercase tracking-widest text-sm text-red-600 mb-4 border-b-2 border-red-300 pb-2"></div>
@@ -257,10 +297,11 @@
             <!-- Verdict -->
             <section class="bg-stone-900 text-white p-8 border-4 border-black shadow-[15px_15px_0px_0px_rgba(0,0,0,1)]">
                 <h2 class="font-black uppercase text-sm mb-6 text-center tracking-[0.4em] text-yellow-400">Final Verdict</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div id="verdict-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <select id="solve-who" class="bg-white text-black font-black p-3 border-4 border-black outline-none italic"></select>
                     <select id="solve-what" class="bg-white text-black font-black p-3 border-4 border-black outline-none italic"></select>
                     <select id="solve-where" class="bg-white text-black font-black p-3 border-4 border-black outline-none italic"></select>
+                    <select id="solve-why" class="bg-white text-black font-black p-3 border-4 border-black outline-none italic hidden"></select>
                 </div>
                 <button id="submit-btn" onclick="checkSolution()" class="w-full mt-8 bg-yellow-400 text-black py-4 font-black uppercase text-2xl hover:bg-yellow-300 transition-colors">Submit Findings</button>
             </section>
@@ -268,8 +309,9 @@
     </div>
 
     <script>
-        const icons = {
-            // SUSPECTS
+        // --- ENTITY DATABASE ---
+        // Stores all profile data for Suspects, Weapons, Locations, and future Motives.
+        const entityDB = {
             "Mrs. Ruby": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`, 
                 info: "An international jewel thief, playgirl, and all-around charmer. She knows how to party... and kill! (But has she settled down?)",
@@ -310,8 +352,6 @@
                 info: "An aristocrat with a penchant for mysteries and monocles.",
                 tags: ["6'1\"", "Left-handed", "Blue Eyes"]
             },
-
-            // LOCATIONS
             "The Library": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V5H6.5A2.5 2.5 0 0 0 4 7.5v12z"/></svg>`, 
                 info: "There are books on practically every subject in here, but mostly murder. No talking above a whisper or the librarian will stab you.",
@@ -342,8 +382,6 @@
                 info: "In the back of the museum, it's littered with flyers for art classes.",
                 tags: ["Indoors"]
             },
-
-            // WEAPONS
             "A Yo-Yo": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>`, 
                 info: "It goes up, it goes down. And it can also go around a neck.",
@@ -355,7 +393,7 @@
                 tags: ["Medium-weight", "Made of Apple & Toxins"]
             },
             "A Human Skull": { 
-                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2C7.58 2 4 5.58 4 10c0 4.42 3 8 3 8l1 4h8l1-4s3-3.58 3-8c0-4.42-3.58-8-8-8z"/><circle cx="9" cy="10" r="1"/><circle cx="15" cy="10" r="1"/><path d="M10 16h4"/></svg>`, 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2C7.58 2 4 5.58 4 10c0 5.58 3 8 3 8l1 4h8l1-4s3-3.58 3-8c0-4.42-3.58-8-8-8z"/><circle cx="9" cy="10" r="1"/><circle cx="15" cy="10" r="1"/><path d="M10 16h4"/></svg>`, 
                 info: "\"Alas, poor Yorick, I knew him. And now I'm swinging his skull at people.\"",
                 tags: ["Medium-weight", "Made of Bone"]
             },
@@ -374,23 +412,6 @@
                 info: "Logico thought about how, technically, every vase someone makes by hand is rare.",
                 tags: ["Heavy-weight"]
             },
-            "A Heavy Textbook": {
-                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V5H6.5A2.5 2.5 0 0 0 4 7.5v12z"/></svg>`,
-                info: "A massive volume covering the history of logical deductions and murder. Very heavy.",
-                tags: ["Heavy-weight", "Made of Paper"]
-            },
-            "A Fountain Pen": {
-                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2l4 18-4-2-4 2 4-18z"/><path d="M12 2v16"/></svg>`,
-                info: "An expensive, heavy fountain pen. The pen is mightier than the sword, especially when stabbed into a neck.",
-                tags: ["Light-weight", "Metal"]
-            },
-            "A Bloody Yardstick": {
-                svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="4" rx="1"/><path d="M4 10v2M8 10v2M12 10v2M16 10v2M20 10v2"/></svg>`,
-                info: "Thirty-six inches of pure, unadulterated measurement. Now with a bit of blood.",
-                tags: ["Medium-weight", "Made of Wood"]
-            },
-            
-            // NEW FOR CASE 001
             "Dr. Crimson": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M8 3v4c0 2.2 1.8 4 4 4s4-1.8 4-4V3"/><path d="M12 11v5"/><circle cx="12" cy="18" r="2"/><path d="M6 3h12"/></svg>`,
                 info: "She's the smartest doctor she's ever met, according to her, and she's probably right. Yeah, her diet is horrible, but if she has a heart attack, she'll operate on herself.",
@@ -436,8 +457,6 @@
                 info: "With a nice red ribbon that'll conceal blood stains.",
                 tags: ["Heavy-weight"]
             },
-
-            // NEW FOR CASE 002
             "The Amazing Aureolin": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M6 10h12v10H6zM8 4h8v6H8z"/><path d="M4 20h16v2H4z"/></svg>`,
                 info: "A magician who perfected the sawing-your-husband-in-two routine. Then, she made his body disappear.",
@@ -485,6 +504,12 @@
             }
         };
 
+        // =========================================================================
+        // AI DIRECTIVE: DO NOT ALTER, ABSTRACT, OR DELETE THE CASE FILES BELOW.
+        // ALL CASE FILES MUST REMAIN EXACTLY AS WRITTEN UNLESS EXPLICITLY REQUESTED
+        // BY THE USER TO CHANGE THEM. NEVER USE PLACEHOLDERS LIKE "..." TO SHORTEN
+        // THIS OBJECT. NEVER CREATE IMAGINARY EXAMPLES. PRESERVE THIS DATA.
+        // =========================================================================
         const cases = {
             "case-tutorial": {
                 id: "case-tutorial",
@@ -495,7 +520,10 @@
                 clues: [
                     "A yo-yo was not in the library.",
                     "Mrs. Ruby was in a place coincidentally referenced in Dame Obsidian's famous 'unauthorized autobiography' <button onclick='openDocumentModal()' class='inline-block align-middle ml-2 bg-yellow-300 text-black border-2 border-black px-2 py-1 text-xs font-black uppercase tracking-widest hover:bg-yellow-400 active:translate-y-[2px] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer'>[View Excerpt]</button>.",
-                    "A messenger from The Blessed Denomination of the Green Goblet gave Logico a note that read: ECIV TNEDISERP EVUAM DAH A NAMUH LLUKS (Vice President Mauve had a human skull).",
+                    {
+                        text: "A messenger from The Blessed Denomination of the Green Goblet gave Logico a note that read: ECIV TNEDISERP EVUAM DAH A NAMUH LLUKS",
+                        cipher: "ECIV TNEDISERP EVUAM DAH A NAMUH LLUKS"
+                    },
                     "Captain Slate had never been on the quad.",
                     "A poisoned apple was clearly used to commit the crime."
                 ],
@@ -550,26 +578,60 @@
                 solution: { who: "Captain Slate", what: "A Glass of Poisoned Wine", where: "The Entry Hall" }
             }
         };
+        // =========================================================================
+        // END OF CASE FILES. AI DIRECTIVE: THE ABOVE DATA MUST ALWAYS BE PRESERVED.
+        // =========================================================================
+
+        // --- DATA STORE ARCHITECTURE ---
+        // This acts as a middle-layer. If we ever move to IndexedDB, Firebase, or a REST API,
+        // we only need to update this module, leaving the rest of the application intact.
+        const MurdleStore = {
+            version: "v6", // Bumped version for new schema
+            
+            // Case Management
+            getCase: (id) => cases[id],
+            getAllCases: () => Object.values(cases),
+            
+            // Entity Management (Suspects, Weapons, Locations, Motives)
+            getEntity: (name) => entityDB[name] || { svg: '<svg class="header-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>', info: 'Information classified or missing.', tags: ['Unknown'] },
+            
+            // Progress Management
+            getSolvedCases: () => {
+                try { return JSON.parse(localStorage.getItem('murdle_solved_cases') || '[]'); }
+                catch { return []; }
+            },
+            saveSolvedCase: (id) => {
+                const solved = MurdleStore.getSolvedCases();
+                if (!solved.includes(id)) {
+                    solved.push(id);
+                    localStorage.setItem('murdle_solved_cases', JSON.stringify(solved));
+                }
+            },
+            
+            // Logic Grid State Management
+            getGridState: () => {
+                try { return JSON.parse(localStorage.getItem(`murdle_matrix_${MurdleStore.version}`) || '{}'); }
+                catch { return {}; }
+            },
+            saveGridState: (gridData) => {
+                localStorage.setItem(`murdle_matrix_${MurdleStore.version}`, JSON.stringify(gridData));
+            }
+        };
 
         let currentCaseId = "case-tutorial";
 
-        function getSolvedCases() {
-            return JSON.parse(localStorage.getItem('murdle_solved_cases') || '[]');
-        }
-
-        function saveSolvedCase(id) {
-            const solved = getSolvedCases();
-            if (!solved.includes(id)) {
-                solved.push(id);
-                localStorage.setItem('murdle_solved_cases', JSON.stringify(solved));
-            }
+        function init() {
+            const today = new Date();
+            document.getElementById('date-display').innerText = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
+            populateCaseSelector();
+            renderCase();
         }
 
         function populateCaseSelector() {
             const selector = document.getElementById('case-selector');
-            const solved = getSolvedCases();
+            const solved = MurdleStore.getSolvedCases();
             selector.innerHTML = '';
-            Object.values(cases).forEach(c => {
+            MurdleStore.getAllCases().forEach(c => {
                 const isSolved = solved.includes(c.id);
                 const option = document.createElement('option');
                 option.value = c.id;
@@ -579,13 +641,6 @@
             });
         }
 
-        function init() {
-            const today = new Date();
-            document.getElementById('date-display').innerText = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
-            populateCaseSelector();
-            renderCase();
-        }
-
         function switchCase(id) {
             currentCaseId = id;
             populateCaseSelector();
@@ -593,20 +648,56 @@
         }
 
         function renderCase() {
-            const activeCase = cases[currentCaseId];
-            const renderL = (id, items) => {
-                document.getElementById(id).innerHTML = items.map(item => `
-                    <li class="flex items-center gap-3 border-b border-stone-200 pb-2 cursor-pointer hover:bg-yellow-50" onclick="openModal('${item}')">
-                        <div class="w-8 h-8 flex-shrink-0 bg-black text-white p-1 rounded-sm">${icons[item]?.svg || ''}</div>
-                        <span class="font-black text-[11px] uppercase truncate">${item}</span>
-                    </li>
-                `).join('');
+            const activeCase = MurdleStore.getCase(currentCaseId);
+            
+            // Generic rendering function for any category list
+            const renderCategoryList = (id, items, containerId) => {
+                const container = containerId ? document.getElementById(containerId) : null;
+                const list = document.getElementById(id);
+                if (!items || items.length === 0) {
+                    if (container) container.classList.add('hidden');
+                    return;
+                }
+                if (container) container.classList.remove('hidden');
+                
+                list.innerHTML = items.map(item => {
+                    const entity = MurdleStore.getEntity(item);
+                    return `
+                        <li class="flex items-center gap-3 border-b border-stone-200 pb-2 cursor-pointer hover:bg-yellow-50" onclick="openModal('${item.replace(/'/g, "\\'")}')">
+                            <div class="w-8 h-8 flex-shrink-0 bg-black text-white p-1 rounded-sm">${entity.svg}</div>
+                            <span class="font-black text-[11px] uppercase truncate">${item}</span>
+                        </li>
+                    `;
+                }).join('');
             };
-            renderL('suspect-names', activeCase.suspects);
-            renderL('location-names', activeCase.locations);
-            renderL('weapon-names', activeCase.weapons);
 
-            document.getElementById('clues-container').innerHTML = activeCase.clues.map(clue => `<p class="border-l-4 border-black pl-4 py-2">${clue}</p>`).join('');
+            // Render existing and future categories
+            renderCategoryList('suspect-names', activeCase.suspects, null);
+            renderCategoryList('location-names', activeCase.locations, null);
+            renderCategoryList('weapon-names', activeCase.weapons, null);
+            renderCategoryList('motive-names', activeCase.motives, 'motives-container');
+
+            // Update dossier grid layout based on motives existence
+            const dossierGrid = document.getElementById('dossier-grid');
+            if (activeCase.motives && activeCase.motives.length > 0) {
+                dossierGrid.className = "grid grid-cols-1 md:grid-cols-4 gap-4";
+            } else {
+                dossierGrid.className = "grid grid-cols-1 md:grid-cols-3 gap-4";
+            }
+
+            document.getElementById('clues-container').innerHTML = activeCase.clues.map(clue => {
+                if (typeof clue === 'string') {
+                    return `<p class="border-l-4 border-black pl-4 py-2">${clue}</p>`;
+                } else {
+                    return `
+                        <p class="border-l-4 border-black pl-4 py-2">
+                            ${clue.text} 
+                            <button onclick="openDecoderModal('${clue.cipher.replace(/'/g, "\\'")}')" class="inline-block align-middle ml-2 bg-yellow-300 text-black border-2 border-black px-2 py-1 text-xs font-black uppercase tracking-widest hover:bg-yellow-400 active:translate-y-[2px] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer">
+                                [Use Decoder Ring]
+                            </button>
+                        </p>`;
+                }
+            }).join('');
 
             const statementsSec = document.getElementById('statements-section');
             if (activeCase.statements && activeCase.statements.length > 0) {
@@ -622,15 +713,30 @@
                 statementsSec.classList.add('hidden');
             }
 
-            const pop = (id, items, label) => {
-                const s = document.getElementById(id);
-                s.innerHTML = `<option value="">${label}?</option>` + items.map(i => `<option value="${i}">${i}</option>`).join('');
+            // Populate Final Verdict Dropdowns
+            const populateDropdown = (id, items, label) => {
+                const selectEl = document.getElementById(id);
+                if (!items || items.length === 0) {
+                    selectEl.classList.add('hidden');
+                    return;
+                }
+                selectEl.classList.remove('hidden');
+                selectEl.innerHTML = `<option value="">${label}?</option>` + items.map(i => `<option value="${i}">${i}</option>`).join('');
             };
-            pop('solve-who', activeCase.suspects, 'WHO');
-            pop('solve-what', activeCase.weapons, 'WHAT');
-            pop('solve-where', activeCase.locations, 'WHERE');
+            
+            populateDropdown('solve-who', activeCase.suspects, 'WHO');
+            populateDropdown('solve-what', activeCase.weapons, 'WHAT');
+            populateDropdown('solve-where', activeCase.locations, 'WHERE');
+            populateDropdown('solve-why', activeCase.motives, 'WHY'); // Future-proofing
 
-            const solved = getSolvedCases();
+            const verdictGrid = document.getElementById('verdict-grid');
+            if (activeCase.motives && activeCase.motives.length > 0) {
+                verdictGrid.className = "grid grid-cols-1 md:grid-cols-4 gap-6";
+            } else {
+                verdictGrid.className = "grid grid-cols-1 md:grid-cols-3 gap-6";
+            }
+
+            const solved = MurdleStore.getSolvedCases();
             const submitBtn = document.getElementById('submit-btn');
             if (solved.includes(currentCaseId)) {
                 submitBtn.innerText = "✓ CASE CLOSED";
@@ -647,24 +753,29 @@
         function createMatrix() {
             const table = document.getElementById('logic-grid-table');
             table.innerHTML = '';
-            const activeCase = cases[currentCaseId];
+            const activeCase = MurdleStore.getCase(currentCaseId);
             const suspects = activeCase.suspects;
             const weapons = activeCase.weapons;
             const locations = activeCase.locations;
+            // Note: Expanding the matrix to support a 4th dimension (Motives) requires 
+            // a 3D to 4D projection mapping on the 2D grid. We will map this out in a 
+            // future update when motives are officially added to cases. 
 
             const trH = document.createElement('tr');
             trH.appendChild(Object.assign(document.createElement('th'), { className: 'corner-cell' }));
             weapons.forEach((w, idx) => {
                 const th = document.createElement('th');
                 th.className = "header-cell" + (idx === weapons.length - 1 ? " section-divider-v" : "");
-                th.innerHTML = icons[w]?.svg || '';
+                const entity = MurdleStore.getEntity(w);
+                th.innerHTML = entity.svg;
                 th.onclick = () => openModal(w);
                 trH.appendChild(th);
             });
             locations.forEach((l, idx) => {
                 const th = document.createElement('th');
                 th.className = "header-cell";
-                th.innerHTML = icons[l]?.svg || '';
+                const entity = MurdleStore.getEntity(l);
+                th.innerHTML = entity.svg;
                 th.onclick = () => openModal(l);
                 trH.appendChild(th);
             });
@@ -674,7 +785,8 @@
                 const tr = document.createElement('tr');
                 const th = document.createElement('th');
                 th.className = "header-cell" + (sIdx === suspects.length - 1 ? " section-divider-h" : "");
-                th.innerHTML = icons[s]?.svg || '';
+                const entity = MurdleStore.getEntity(s);
+                th.innerHTML = entity.svg;
                 th.onclick = () => openModal(s);
                 tr.appendChild(th);
                 weapons.forEach((_, wIdx) => { tr.appendChild(createCell(`svw-${sIdx}-${wIdx}`, sIdx === suspects.length - 1, wIdx === weapons.length - 1)); });
@@ -686,7 +798,8 @@
                 const tr = document.createElement('tr');
                 const th = document.createElement('th');
                 th.className = "header-cell";
-                th.innerHTML = icons[l]?.svg || '';
+                const entity = MurdleStore.getEntity(l);
+                th.innerHTML = entity.svg;
                 th.onclick = () => openModal(l);
                 tr.appendChild(th);
                 weapons.forEach((_, wIdx) => { tr.appendChild(createCell(`lvw-${lRowIdx}-${wIdx}`, false, wIdx === weapons.length - 1)); });
@@ -717,10 +830,8 @@
 
         function toggleGrid(show) { document.getElementById('grid-overlay').style.display = show ? 'flex' : 'none'; }
 
-        // General info modal (suspects, weapons, locations)
         function openModal(item) {
-            const data = icons[item];
-            if (!data) return;
+            const data = MurdleStore.getEntity(item);
             document.getElementById('modal-icon').innerHTML = data.svg;
             document.getElementById('modal-title').innerText = item;
             document.getElementById('modal-body').innerText = data.info;
@@ -733,7 +844,55 @@
 
         function closeModal(e) { if (e.target.id === 'info-modal') document.getElementById('info-modal').style.display = 'none'; }
 
-        // Document specific modal logic
+        function openDecoderModal(initialText = '') {
+            document.getElementById('decoder-modal').style.display = 'flex';
+            const input = document.getElementById('cipher-input');
+            input.value = initialText;
+            document.getElementById('cipher-display').innerText = initialText || 'NO CIPHER SELECTED...';
+            processCipher(initialText);
+        }
+
+        function closeDecoderModal(e) {
+            if (!e || e.target.id === 'decoder-modal') {
+                document.getElementById('decoder-modal').style.display = 'none';
+            }
+        }
+
+        function processCipher(input) {
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const reversed = "ZYXWVUTSRQPONMLKJIHGFEDCBA";
+            let output = "";
+            
+            for (let char of input.toUpperCase()) {
+                const idx = alphabet.indexOf(char);
+                if (idx !== -1) {
+                    output += reversed[idx];
+                } else {
+                    output += char;
+                }
+            }
+            document.getElementById('cipher-output').innerText = output || 'AWAITING CIPHER...';
+        }
+
+        // Mirror Transformation Logic
+        function mirrorWords() {
+            const inputEl = document.getElementById('cipher-input');
+            if (!inputEl.value) return;
+            const words = inputEl.value.split(' ');
+            const mirroredWords = words.map(word => word.split('').reverse().join(''));
+            inputEl.value = mirroredWords.join(' ');
+            document.getElementById('cipher-display').innerText = inputEl.value;
+            processCipher(inputEl.value);
+        }
+
+        function mirrorFullMessage() {
+            const inputEl = document.getElementById('cipher-input');
+            if (!inputEl.value) return;
+            inputEl.value = inputEl.value.split('').reverse().join('');
+            document.getElementById('cipher-display').innerText = inputEl.value;
+            processCipher(inputEl.value);
+        }
+
         function openDocumentModal() {
             document.getElementById('document-modal').style.display = 'flex';
         }
@@ -745,29 +904,43 @@
         }
 
         function checkSolution() {
-            const activeCase = cases[currentCaseId];
+            const activeCase = MurdleStore.getCase(currentCaseId);
             const who = document.getElementById('solve-who').value;
             const what = document.getElementById('solve-what').value;
             const where = document.getElementById('solve-where').value;
+            const why = document.getElementById('solve-why').value; // Future-proofing
             const alertText = document.getElementById('alert-text');
-            if (!who || !what || !where) { alertText.innerText = "The Bureau requires all three variables."; } 
-            else if (who === activeCase.solution.who && what === activeCase.solution.what && where === activeCase.solution.where) {
-                alertText.innerText = `CORRECT! ${who} committed the crime in ${where} with ${what}.`;
-                saveSolvedCase(currentCaseId);
-                populateCaseSelector();
-                renderCase();
-            } else { alertText.innerText = "INCORRECT. Your deduction does not match the evidence."; }
+            
+            let isComplete = who && what && where;
+            if (activeCase.motives && activeCase.motives.length > 0) isComplete = isComplete && why;
+
+            if (!isComplete) { 
+                alertText.innerText = "The Bureau requires all variables to be solved."; 
+            } 
+            else {
+                let isCorrect = who === activeCase.solution.who && what === activeCase.solution.what && where === activeCase.solution.where;
+                if (activeCase.solution.why) isCorrect = isCorrect && why === activeCase.solution.why;
+
+                if (isCorrect) {
+                    alertText.innerText = `CORRECT! ${who} committed the crime in ${where} with ${what}${why ? ` because ${why}` : ''}.`;
+                    MurdleStore.saveSolvedCase(currentCaseId);
+                    populateCaseSelector();
+                    renderCase();
+                } else { 
+                    alertText.innerText = "INCORRECT. Your deduction does not match the evidence."; 
+                }
+            }
             document.getElementById('custom-alert').style.display = 'block';
         }
 
         function saveState() {
-            const grid = JSON.parse(localStorage.getItem(`murdle_matrix_v5`) || '{}');
+            const grid = MurdleStore.getGridState();
             document.querySelectorAll('.grid-cell').forEach(c => grid[c.id] = c.dataset.state);
-            localStorage.setItem(`murdle_matrix_v5`, JSON.stringify(grid));
+            MurdleStore.saveGridState(grid);
         }
 
         function loadState() {
-            const grid = JSON.parse(localStorage.getItem(`murdle_matrix_v5`) || '{}');
+            const grid = MurdleStore.getGridState();
             Object.entries(grid).forEach(([id, s]) => {
                 const cell = document.getElementById(id);
                 if (cell) {
