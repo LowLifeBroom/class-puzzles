@@ -131,7 +131,7 @@
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #000; }
         
-        #custom-alert {
+        #custom-alert, #confirm-reset-modal {
             display: none;
         }
     </style>
@@ -238,6 +238,18 @@
         </div>
     </div>
 
+    <!-- Confirm Reset Modal -->
+    <div id="confirm-reset-modal" class="fixed inset-0 bg-black/80 z-[200] flex items-center justify-center p-4">
+        <div class="bg-white border-8 border-black p-8 max-w-md w-full shadow-[15px_15px_0px_0px_rgba(251,191,36,1)] text-center relative">
+            <h2 class="text-3xl font-black uppercase italic tracking-tighter mb-4 border-b-4 border-black pb-2 text-red-600">Reset Case?</h2>
+            <p class="text-lg font-bold italic mb-6">Are you sure you want to clear your findings and reset the logic grid for this case?</p>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="document.getElementById('confirm-reset-modal').style.display='none'" class="bg-stone-300 text-black px-4 py-3 font-black uppercase text-lg hover:bg-stone-400 border-4 border-black transition-colors">Cancel</button>
+                <button onclick="resetCurrentCase()" class="bg-red-600 text-white px-4 py-3 font-black uppercase text-lg hover:bg-red-700 border-4 border-black transition-colors">Erase Data</button>
+            </div>
+        </div>
+    </div>
+
     <!-- FAB -->
     <div class="fab-trigger" onclick="toggleGrid(true)">
         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16m-7 6h7"/></svg>
@@ -309,6 +321,7 @@
                     <select id="solve-why" class="bg-white text-black font-black p-3 border-4 border-black outline-none italic hidden"></select>
                 </div>
                 <button id="submit-btn" onclick="checkSolution()" class="w-full mt-8 bg-yellow-400 text-black py-4 font-black uppercase text-2xl hover:bg-yellow-300 transition-colors">Submit Findings</button>
+                <button id="reset-case-btn" onclick="document.getElementById('confirm-reset-modal').style.display='flex'" class="hidden w-full mt-4 border-4 border-stone-700 bg-stone-800 text-stone-300 py-3 font-black uppercase text-sm hover:bg-stone-700 hover:text-white transition-colors">Want to do this Case again?</button>
             </section>
         </main>
     </div>
@@ -329,8 +342,8 @@
             },
             "Vice President Mauve": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`, 
-                info: "Vice President of TekCo Futures. If she asks you to step into her metaverse, run away.",
-                tags: ["5'8\"", "Right-handed", "Brown Eyes", "Black Hair", "Taurus"]
+                info: "A vice president of TekCo Futures. If she asks you to step into her metaverse, politely decline.",
+                tags: ["5'8\"", "Right-handed", "Dark Brown Eyes", "Black Hair"]
             },
             "Bishop Azure": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1 3-6z"/></svg>`, 
@@ -556,6 +569,46 @@
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor"/><path d="M21 21l-6-6" fill="none" stroke="currentColor"/></svg>`,
                 info: "Logico uses this to find clues and to read the fine print. Made with crystal from Emerald Industries.",
                 tags: ["Detective Kit", "Exhibit A"]
+            },
+            "Chef Aubergine": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M6 13.5V21h12v-7.5a4 4 0 001.81-7.16A4 4 0 0015.5 3h-7a4 4 0 00-4.31 3.34A4 4 0 006 13.5z" fill="none" stroke="currentColor"/></svg>`,
+                info: "It is said that she once killed her husband, cooked him, and then served him at her restaurant. It's not true, but just the fact that it's said about her tells you something.",
+                tags: ["5'2\"", "Right-handed", "Blue Eyes", "Blond Hair"]
+            },
+            "Philosopher Bone": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><circle cx="8" cy="10" r="3" fill="none" stroke="currentColor"/><circle cx="16" cy="10" r="3" fill="none" stroke="currentColor"/><path d="M11 10h2M7 16c1.5-2 3.5-2 5 0 1.5-2 3.5-2 5 0M12 16v2" fill="none" stroke="currentColor"/></svg>`,
+                info: "A dashing, dark philosopher who pioneered the ethical theory that he is not responsible for his actions, but he should be paid for them.",
+                tags: ["5'1\"", "Right-handed", "Light Brown Eyes", "Bald"]
+            },
+            "The Locomotive": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="3" y="10" width="12" height="10" fill="none" stroke="currentColor"/><rect x="15" y="6" width="6" height="14" fill="none" stroke="currentColor"/><circle cx="6" cy="20" r="2" fill="none" stroke="currentColor"/><circle cx="11" cy="20" r="2" fill="none" stroke="currentColor"/><circle cx="18" cy="20" r="2" fill="none" stroke="currentColor"/><path d="M5 10V6M9 10V4" fill="none" stroke="currentColor"/></svg>`,
+                info: "The deafening sound of the steam engine prevents Deductive Logico from being able to think.",
+                tags: ["Indoors"]
+            },
+            "The Caboose": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" fill="none" stroke="currentColor"/><path d="M2 20h20M7 8V5h10v3M8 12h3v4H8zM13 12h3v4h-3z" fill="none" stroke="currentColor"/></svg>`,
+                info: "The back of the train lets you see where you're leaving, and what you're leaving behind...",
+                tags: ["Indoors"]
+            },
+            "The Roof": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M3 14l9-8 9 8M4 14v6h16v-6M12 6v6" fill="none" stroke="currentColor"/></svg>`,
+                info: "What with the wind and the smoke from the smokestack, it's hard to get your bearings up here.",
+                tags: ["Outdoors"]
+            },
+            "An Imported Italian Knife": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M18.4 5.6a3 3 0 00-4.2 0L4 15.8 8.2 20l10.2-10.2a3 3 0 000-4.2zM8.2 20L4 15.8M14 10l-4 4" fill="none" stroke="currentColor"/></svg>`,
+                info: "It looks priceless, and that's technically true, because it's worthless.",
+                tags: ["Light-weight"]
+            },
+            "Leather Luggage": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="2" fill="none" stroke="currentColor"/><path d="M8 8V5a2 2 0 012-2h4a2 2 0 012 2v3M4 14h16" fill="none" stroke="currentColor"/></svg>`,
+                info: "This luggage is hideous. The leather looked way better on the cow.",
+                tags: ["Heavy-weight"]
+            },
+            "A Rolled-Up Newspaper (With a Crowbar Inside)": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M6 4h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2zM6 8h12M6 12h12M6 16h8" fill="none" stroke="currentColor"/></svg>`,
+                info: "You think, that's just a newspaper! But then...wham!",
+                tags: ["Medium-weight"]
             }
         };
 
@@ -566,23 +619,20 @@
         // THIS OBJECT. NEVER CREATE IMAGINARY EXAMPLES. PRESERVE THIS DATA.
         // =========================================================================
         const cases = {
-            "case-tutorial": {
-                id: "case-tutorial",
-                title: "File 000: Deduction College",
-                suspects: ["Mrs. Ruby", "Captain Slate", "Vice President Mauve"],
-                locations: ["The Library", "The Quad", "The Science Lab"],
-                weapons: ["A Yo-Yo", "A Poisoned Apple", "A Human Skull"],
+            "case-000": {
+                id: "case-000",
+                title: "File 000: The Last Train to Murder",
+                suspects: ["Vice President Mauve", "Chef Aubergine", "Philosopher Bone"],
+                locations: ["The Locomotive", "The Caboose", "The Roof"],
+                weapons: ["An Imported Italian Knife", "Leather Luggage", "A Rolled-Up Newspaper (With a Crowbar Inside)"],
                 clues: [
-                    "A yo-yo was not in the library.",
-                    "Mrs. Ruby was in a place coincidentally referenced in Dame Obsidian's famous 'unauthorized autobiography' <button onclick='openDocumentModal()' class='inline-block align-middle ml-2 bg-yellow-300 text-black border-2 border-black px-2 py-1 text-xs font-black uppercase tracking-widest hover:bg-yellow-400 active:translate-y-[2px] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer'>[View Excerpt]</button>.",
-                    {
-                        text: "A messenger from The Blessed Denomination of the Green Goblet gave Logico a note that read: ECIV TNEDISERP EVUAM DAH A NAMUH LLUKS",
-                        cipher: "ECIV TNEDISERP EVUAM DAH A NAMUH LLUKS"
-                    },
-                    "Captain Slate had never been on the quad.",
-                    "A poisoned apple was clearly used to commit the crime."
+                    "A page from the classifieds was found near the heat of a steam engine.",
+                    "Chef Aubergine and the person who brought leather luggage had a history together.",
+                    "The tallest suspect never set foot in the caboose.",
+                    "Philosopher Bone was seen wandering around outdoors.",
+                    "The conductor had been stabbed to death."
                 ],
-                solution: { who: "Captain Slate", what: "A Poisoned Apple", where: "The Library" }
+                solution: { who: "Chef Aubergine", what: "An Imported Italian Knife", where: "The Caboose" }
             },
             "case-001": {
                 id: "case-001",
@@ -677,6 +727,11 @@
                     localStorage.setItem('murdle_solved_cases', JSON.stringify(solved));
                 }
             },
+            removeSolvedCase: (id) => {
+                let solved = MurdleStore.getSolvedCases();
+                solved = solved.filter(caseId => caseId !== id);
+                localStorage.setItem('murdle_solved_cases', JSON.stringify(solved));
+            },
             
             // Logic Grid State Management
             getGridState: () => {
@@ -685,10 +740,19 @@
             },
             saveGridState: (gridData) => {
                 localStorage.setItem(`murdle_matrix_${MurdleStore.version}`, JSON.stringify(gridData));
+            },
+            clearGridStateForCase: (id) => {
+                const grid = MurdleStore.getGridState();
+                Object.keys(grid).forEach(key => {
+                    if (key.startsWith(id + '-')) {
+                        delete grid[key];
+                    }
+                });
+                MurdleStore.saveGridState(grid);
             }
         };
 
-        let currentCaseId = "case-tutorial";
+        let currentCaseId = "case-000";
 
         function init() {
             const today = new Date();
@@ -713,6 +777,13 @@
 
         function switchCase(id) {
             currentCaseId = id;
+            
+            // Reset dropdown values to empty when switching cases
+            document.getElementById('solve-who').value = "";
+            document.getElementById('solve-what').value = "";
+            document.getElementById('solve-where').value = "";
+            document.getElementById('solve-why').value = "";
+            
             populateCaseSelector();
             renderCase();
         }
@@ -786,12 +857,19 @@
             // Populate Final Verdict Dropdowns
             const populateDropdown = (id, items, label) => {
                 const selectEl = document.getElementById(id);
+                // Keep the current selection if it exists and is valid, otherwise set empty
+                const currentVal = selectEl.value; 
+                
                 if (!items || items.length === 0) {
                     selectEl.classList.add('hidden');
                     return;
                 }
                 selectEl.classList.remove('hidden');
                 selectEl.innerHTML = `<option value="">${label}?</option>` + items.map(i => `<option value="${i}">${i}</option>`).join('');
+                
+                if (items.includes(currentVal)) {
+                    selectEl.value = currentVal;
+                }
             };
             
             populateDropdown('solve-who', activeCase.suspects, 'WHO');
@@ -808,16 +886,35 @@
 
             const solved = MurdleStore.getSolvedCases();
             const submitBtn = document.getElementById('submit-btn');
+            const resetBtn = document.getElementById('reset-case-btn');
+            
             if (solved.includes(currentCaseId)) {
                 submitBtn.innerText = "✓ CASE CLOSED";
                 submitBtn.className = "w-full mt-8 bg-green-500 text-white py-4 font-black uppercase text-2xl hover:bg-green-400 transition-colors";
+                resetBtn.classList.remove('hidden');
             } else {
                 submitBtn.innerText = "Submit Findings";
                 submitBtn.className = "w-full mt-8 bg-yellow-400 text-black py-4 font-black uppercase text-2xl hover:bg-yellow-300 transition-colors";
+                resetBtn.classList.add('hidden');
             }
 
             createMatrix();
             loadState();
+        }
+
+        function resetCurrentCase() {
+            MurdleStore.removeSolvedCase(currentCaseId);
+            MurdleStore.clearGridStateForCase(currentCaseId);
+            
+            // Close modal and reset dropdowns explicitly
+            document.getElementById('confirm-reset-modal').style.display = 'none';
+            document.getElementById('solve-who').value = "";
+            document.getElementById('solve-what').value = "";
+            document.getElementById('solve-where').value = "";
+            document.getElementById('solve-why').value = "";
+            
+            populateCaseSelector();
+            renderCase();
         }
 
         function createMatrix() {
