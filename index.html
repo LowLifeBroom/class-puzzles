@@ -328,7 +328,15 @@
 
     <script>
         // --- ENTITY DATABASE ---
-        // Stores all profile data for Suspects, Weapons, Locations, and future Motives.
+        // =========================================================================
+        // AI DIRECTIVE: CASE-SPECIFIC PROFILES
+        // Do NOT overwrite existing global profiles when characters/locations recur 
+        // in new cases, as it breaks the flavor text/context for older cases. 
+        // Instead, use the format "Entity Name_case-ID" for the new entry.
+        // Example: "Dr. Crimson" (Global) vs "Dr. Crimson_case-005" (Specific)
+        // The Data Store will automatically use the specific profile if it exists, 
+        // otherwise it will safely fall back to the original global profile.
+        // =========================================================================
         const entityDB = {
             "Mrs. Ruby": { 
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`, 
@@ -434,6 +442,11 @@
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M8 3v4c0 2.2 1.8 4 4 4s4-1.8 4-4V3"/><path d="M12 11v5"/><circle cx="12" cy="18" r="2"/><path d="M6 3h12"/></svg>`,
                 info: "She's the smartest doctor she's ever met, according to her, and she's probably right. Yeah, her diet is horrible, but if she has a heart attack, she'll operate on herself.",
                 tags: ["5'9\"", "Left-handed", "Green Eyes", "Red Hair", "Aquarius"]
+            },
+            "Dr. Crimson_case-005": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M8 3v4c0 2.2 1.8 4 4 4s4-1.8 4-4V3"/><path d="M12 11v5"/><circle cx="12" cy="18" r="2"/><path d="M6 3h12"/></svg>`,
+                info: "She's the smartest doctor she's ever met, according to her, and she's probably right. Yeah, she smokes, but if she gets cancer, she'll find a cure.",
+                tags: ["5'9\"", "Left-handed", "Green Eyes", "Red Hair"]
             },
             "Mayor Honey": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M5 8h14M7 8v10a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V8"/><path d="M9 4h6v4H9z"/></svg>`,
@@ -595,6 +608,11 @@
                 info: "What with the wind and the smoke from the smokestack, it's hard to get your bearings up here.",
                 tags: ["Outdoors"]
             },
+            "The Roof_case-005": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M3 14l9-8 9 8M4 14v6h16v-6M12 6v6" fill="none" stroke="currentColor"/></svg>`,
+                info: "Huge AC units and other industrial equipment cover the roof, providing a number of excellent hiding spots.",
+                tags: ["Outdoors"]
+            },
             "An Imported Italian Knife": {
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M18.4 5.6a3 3 0 00-4.2 0L4 15.8 8.2 20l10.2-10.2a3 3 0 000-4.2zM8.2 20L4 15.8M14 10l-4 4" fill="none" stroke="currentColor"/></svg>`,
                 info: "It looks priceless, and that's technically true, because it's worthless.",
@@ -609,6 +627,41 @@
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M6 4h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2zM6 8h12M6 12h12M6 16h8" fill="none" stroke="currentColor"/></svg>`,
                 info: "You think, that's just a newspaper! But then...wham!",
                 tags: ["Medium-weight"]
+            },
+            "Officer Copper": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M4 10l2-4h12l2 4M2 10h20v4H2z" fill="none" stroke="currentColor"/><circle cx="12" cy="7" r="1.5" fill="currentColor"/><path d="M9 14v5h6v-5" fill="none" stroke="currentColor"/></svg>`,
+                info: "The best part of being a policewoman criminal is that you can cut out the middleman and fail to investigate your own crimes.",
+                tags: ["5'5\"", "Right-handed", "Blue Eyes", "Blond Hair"]
+            },
+            "Sister Lapis": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M6 5h12v7c0 3.3-2.7 6-6 6s-6-2.7-6-6V5z" fill="none" stroke="currentColor"/><path d="M9 21h6" fill="none" stroke="currentColor"/><path d="M12 10v6M10 12h4" fill="none" stroke="currentColor"/></svg>`,
+                info: "A nun who travels the world, doing God's work on His dime. Her habit is cashmere, and her habit is spending.",
+                tags: ["5'2\"", "Right-handed", "Light Brown Eyes", "Light Brown Hair"]
+            },
+            "The Parking Lot": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="2" y="10" width="8" height="6" rx="1" fill="none" stroke="currentColor"/><circle cx="4" cy="16" r="1" fill="currentColor"/><circle cx="8" cy="16" r="1" fill="currentColor"/><rect x="14" y="10" width="8" height="6" rx="1" fill="none" stroke="currentColor"/><circle cx="16" cy="16" r="1" fill="currentColor"/><circle cx="20" cy="16" r="1" fill="currentColor"/><path d="M2 18h20" fill="none" stroke="currentColor"/></svg>`,
+                info: "An enormous parking lot with uniformed valets parking luxury sedans.",
+                tags: ["Outdoors"]
+            },
+            "The Gift Shop": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="4" y="9" width="16" height="11" fill="none" stroke="currentColor"/><path d="M12 9V4M9 4h6" fill="none" stroke="currentColor"/><path d="M12 9c-2-2-5-2-5 0s5 2 5 0zm0 0c2-2 5-2 5 0s-5 2-5 0z" fill="none" stroke="currentColor"/></svg>`,
+                info: "This hospital is so nice you can buy jewelry at the gift shop. But don't worry: there's a discount rack, too.",
+                tags: ["Indoors"]
+            },
+            "A Vial of Acid": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M9 3h6v4l3 5v9H6v-9l3-5V3z" fill="none" stroke="currentColor"/><path d="M6 14h12M12 17v2" fill="none" stroke="currentColor"/></svg>`,
+                info: "According to the label, you should not take a sip of this, no matter how tempting it seems.",
+                tags: ["Light-weight"]
+            },
+            "A Heavy Microscope": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M8 20h8v2H8zM14 20v-5c2 0 4-2 4-4V6M10 6h4M12 6v5M8 11h4M6 15h6v-2H6z" fill="none" stroke="currentColor"/></svg>`,
+                info: "The slides are so tiny, but the microscope's so heavy!",
+                tags: ["Heavy-weight"]
+            },
+            "A Surgical Scalpel": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M18 4l2 2-8 8-2 2-4-2 2-2 8-8zM4 18l-2 4 4-2" fill="none" stroke="currentColor"/></svg>`,
+                info: "Somehow, it being smaller makes it seem more dangerous.",
+                tags: ["Light-weight"]
             }
         };
 
@@ -696,6 +749,21 @@
                     "By the time Logico got there, the old man's body had been nibbled on by sharks."
                 ],
                 solution: { who: "Father Mango", what: "A Harpoon", where: "The Docks" }
+            },
+            "case-005": {
+                id: "case-005",
+                title: "File 005: Physician, Heal Myself!",
+                suspects: ["Officer Copper", "Dr. Crimson", "Sister Lapis"],
+                locations: ["The Parking Lot", "The Roof", "The Gift Shop"],
+                weapons: ["A Vial of Acid", "A Heavy Microscope", "A Surgical Scalpel"],
+                clues: [
+                    "A vial of acid was certainly not on the roof. (They had acid-detecting sensors there.)",
+                    "The suspect who was in the gift shop had light brown eyes.",
+                    "Officer Copper had a weapon with a label on it reading DO NOT DRINK.",
+                    "Surprisingly, Dr. Crimson did not bring her surgical scalpel (or any surgical scalpel, for that matter).",
+                    "The patient's body was found beneath a luxury sedan."
+                ],
+                solution: { who: "Officer Copper", what: "A Vial of Acid", where: "The Parking Lot" }
             }
         };
         // =========================================================================
@@ -713,7 +781,8 @@
             getAllCases: () => Object.values(cases),
             
             // Entity Management (Suspects, Weapons, Locations, Motives)
-            getEntity: (name) => entityDB[name] || { svg: '<svg class="header-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>', info: 'Information classified or missing.', tags: ['Unknown'] },
+            // AI NOTE: Checks for case-specific profile first, then falls back to global profile.
+            getEntity: (name) => entityDB[`${name}_${currentCaseId}`] || entityDB[name] || { svg: '<svg class="header-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>', info: 'Information classified or missing.', tags: ['Unknown'] },
             
             // Progress Management
             getSolvedCases: () => {
@@ -752,7 +821,7 @@
             }
         };
 
-        let currentCaseId = "case-000";
+        let currentCaseId = "case-005";
 
         function init() {
             const today = new Date();
