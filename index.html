@@ -336,6 +336,11 @@
         // Example: "Dr. Crimson" (Global) vs "Dr. Crimson_case-005" (Specific)
         // The Data Store will automatically use the specific profile if it exists, 
         // otherwise it will safely fall back to the original global profile.
+        //
+        // AI DIRECTIVE: STRICT WORD-FOR-WORD EXTRACTION
+        // When transcribing new entities from user-provided images or text, you MUST
+        // extract the descriptions and tags EXACTLY as written. Do NOT paraphrase,
+        // summarize, or invent any flavor text. Accuracy is critical to the game.
         // =========================================================================
         const entityDB = {
             "Mrs. Ruby": { 
@@ -404,7 +409,7 @@
                 tags: ["Indoors"]
             },
             "An Art Studio": { 
-                svg: `<svg class="header-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10-4.48 10-10 10z"/></svg>`, 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18.5 5.5l.5.5a3.53 3.53 0 0 1-5 5l-2.5-2.5a3.53 3.53 0 0 1 5-5l.5.5z"/><path d="M12 12l-8 8a2.12 2.12 0 0 0 3 3l8-8"/></svg>`, 
                 info: "In the back of the museum, it's littered with flyers for art classes.",
                 tags: ["Indoors"]
             },
@@ -424,7 +429,7 @@
                 tags: ["Medium-weight", "Made of Bone"]
             },
             "A Glass of Poisoned Wine": { 
-                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M15 2H9v2h6V2zM12 11c-2.21 0-4-1.79-4-4h8c0 2.21-1.79 4-4 4zm1 1h-2v7h-2v2h6v-2h-2v-7z"/></svg>`, 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8M12 15v7M6 3v4a6 6 0 0 0 12 0V3H6zM6 8h12"/></svg>`, 
                 info: "This is your typical glass of poisoned wine. A mystery classic.",
                 tags: ["Light-weight"]
             },
@@ -434,7 +439,7 @@
                 tags: ["Heavy-weight"]
             },
             "A Rare Vase": { 
-                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M19 4H5c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2h1v10c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V10h1c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z"/></svg>`, 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6 M8 22h8 M10 2v3C10 7 4 9 4 14C4 19 8 22 8 22 M14 2v3C14 7 20 9 20 14C20 19 16 22 16 22"/></svg>`, 
                 info: "Logico thought about how, technically, every vase someone makes by hand is rare.",
                 tags: ["Heavy-weight"]
             },
@@ -639,12 +644,12 @@
                 tags: ["5'2\"", "Right-handed", "Light Brown Eyes", "Light Brown Hair"]
             },
             "The Parking Lot": {
-                svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="2" y="10" width="8" height="6" rx="1" fill="none" stroke="currentColor"/><circle cx="4" cy="16" r="1" fill="currentColor"/><circle cx="8" cy="16" r="1" fill="currentColor"/><rect x="14" y="10" width="8" height="6" rx="1" fill="none" stroke="currentColor"/><circle cx="16" cy="16" r="1" fill="currentColor"/><circle cx="20" cy="16" r="1" fill="currentColor"/><path d="M2 18h20" fill="none" stroke="currentColor"/></svg>`,
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>`,
                 info: "An enormous parking lot with uniformed valets parking luxury sedans.",
                 tags: ["Outdoors"]
             },
             "The Gift Shop": {
-                svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="4" y="9" width="16" height="11" fill="none" stroke="currentColor"/><path d="M12 9V4M9 4h6" fill="none" stroke="currentColor"/><path d="M12 9c-2-2-5-2-5 0s5 2 5 0zm0 0c2-2 5-2 5 0s-5 2-5 0z" fill="none" stroke="currentColor"/></svg>`,
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="8" width="18" height="13" rx="1"/><path d="M12 8v13M3 13h18"/><path d="M12 8c-2-3-6-2-6 0s6 2 6 0z"/><path d="M12 8c2-3 6-2 6 0s-6 2-6 0z"/></svg>`,
                 info: "This hospital is so nice you can buy jewelry at the gift shop. But don't worry: there's a discount rack, too.",
                 tags: ["Indoors"]
             },
@@ -659,9 +664,106 @@
                 tags: ["Heavy-weight"]
             },
             "A Surgical Scalpel": {
-                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M18 4l2 2-8 8-2 2-4-2 2-2 8-8zM4 18l-2 4 4-2" fill="none" stroke="currentColor"/></svg>`,
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 18 L13 11 L19 3 Q21 6 14 12 L7 19 Z"/><line x1="13" y1="11" x2="14" y2="12"/><line x1="9" y1="15" x2="10" y2="16"/><line x1="11" y1="13" x2="12" y2="14"/></svg>`,
                 info: "Somehow, it being smaller makes it seem more dangerous.",
                 tags: ["Light-weight"]
+            },
+            // =========================================================================
+            // AI DIRECTIVE: EXTRACTED ENTITIES FOR "THE DETECTIVE CLUB KILLER"
+            // (Note: Miss Saffron and General Coffee were already present globally)
+            // =========================================================================
+            "Miss Saffron_case-006": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 12l-7-5v10zM12 12l7-5v10z" fill="currentColor"/><circle cx="12" cy="12" r="2.5" fill="white" stroke="currentColor"/></svg>`,
+                info: "Miss Saffron is technically an aristocrat, but more accurately, she's just plain rich.",
+                tags: ["5'2\"", "Left-handed", "Hazel Eyes", "Blond Hair"]
+            },
+            "General Coffee_case-006": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1M4 8h14v9a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8zM8 3v3M12 3v3M16 3v3"/></svg>`,
+                info: "Now that Detective Club HQ has added a coffee bar, he's there every day.",
+                tags: ["6'0\"", "Right-handed", "Brown Eyes", "Bald"]
+            },
+            "Grandmaster Rose": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 2l-3 6h6zM9 8v4h6V8M8 12v6h8v-6M6 18v4h12v-4z" fill="currentColor"/></svg>`,
+                info: "Chess is a kind of mystery, so Grandmaster Rose fits right in at the DCHQ. (His opponent opened with 1. g4: the Grob.)",
+                tags: ["5'7\"", "Left-handed", "Brown Eyes", "Brown Hair"]
+            },
+            "The Detective Kit Storage Room": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor"/><path d="M8 10h8M8 14h8" stroke="currentColor"/></svg>`,
+                info: "There is a pile of fedora pins next to a printing press for membership cards. Join today!",
+                tags: ["Indoors"]
+            },
+            "The Rooftop Lookout": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M3 21h18M5 21V10l7-5 7 5v11M12 5v5M9 10h6" fill="none" stroke="currentColor"/></svg>`,
+                info: "Where you can keep an eye on the entrance and the pigeons.",
+                tags: ["Outdoors"]
+            },
+            "The Conspiracy Board Room": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" fill="none" stroke="currentColor"/><circle cx="7" cy="9" r="1" fill="currentColor"/><circle cx="17" cy="11" r="1" fill="currentColor"/><circle cx="12" cy="16" r="1" fill="currentColor"/><path d="M7 9l10 2M17 11l-5 5M12 16L7 9" stroke="currentColor" stroke-dasharray="2,2"/></svg>`,
+                info: "The walls are cork-boards covered with newspaper articles connected with red string.",
+                tags: ["Indoors"]
+            },
+            "Murdle: Volume 1": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V5H6.5A2.5 2.5 0 0 0 4 7.5v12z" fill="none" stroke="currentColor"/></svg>`,
+                info: "A copy of the first volume: a great gift and an even greater weapon.",
+                tags: ["Medium-weight"]
+            },
+            "A Magnifying Glass": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6" fill="none" stroke="currentColor"/><path d="M21 21l-6-6" stroke="currentColor"/></svg>`,
+                info: "You could use this to find a clue or to start a small fire. Or both!",
+                tags: ["Medium-weight"]
+            },
+            "A Red Herring": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><ellipse cx="10" cy="12" rx="8" ry="5" /><path d="M18 12l4-4v8z" /><circle cx="7" cy="10" r="1" fill="currentColor" stroke="none" /></svg>`,
+                info: "If you hold it by the tail, you can get some real momentum behind it.",
+                tags: ["Medium-weight"]
+            },
+            // =========================================================================
+            // AI DIRECTIVE: EXTRACTED ENTITIES FOR "THE ZEPPELIVING AND THE DEAD"
+            // =========================================================================
+            "Captain Slate_case-007": { 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/></svg>`, 
+                info: "A real-life astronaut. The first woman to travel around the dark side of the moon, and also the first to be suspected of murdering her copilot.",
+                tags: ["5'5\"", "Left-handed", "Brown Eyes", "Brown Hair"]
+            },
+            "President White": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="none" stroke="currentColor"/><path d="M12 8v4M9 10h6" stroke="currentColor"/></svg>`,
+                info: "The duly elected president of the Royal Resistance, a party of aristocrats who want to retake power. She wears a signet ring.",
+                tags: ["5'10\"", "Right-handed", "Gray Eyes", "White Hair"]
+            },
+            "Dr. Crimson_case-007": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M8 3v4c0 2.2 1.8 4 4 4s4-1.8 4-4V3"/><path d="M12 11v5"/><circle cx="12" cy="18" r="2"/><path d="M6 3h12"/></svg>`,
+                info: "She believes that everyone—no matter their race or creed—deserves the right to medical care, as long as they can afford it.",
+                tags: ["5'9\"", "Left-handed", "Green Eyes", "Red Hair"]
+            },
+            "The Passenger Cabin": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M4 18v3M14 18v3M4 11l2-5h4l2 5M14 11l2-5h4l2 5M4 11v7h6v-7M14 11v7h6v-7" fill="none" stroke="currentColor"/></svg>`,
+                info: "No commercial plane has this much legroom, or a parachute for every passenger.",
+                tags: ["Indoors"]
+            },
+            "The Cargo Hold": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="13" rx="2" fill="none" stroke="currentColor"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M4 11h16" fill="none" stroke="currentColor"/></svg>`,
+                info: "Every single piece of luggage is designer, and each is worth more than its contents.",
+                tags: ["Indoors"]
+            },
+            "The Cockpit": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="5" y="6" width="14" height="12" rx="2" fill="none" stroke="currentColor"/><path d="M9 12h.01M15 12h.01M12 16h.01M8 22h8" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+                info: "Thankfully for the passengers, there is a robotic copilot built by TekCo Futures.",
+                tags: ["Indoors"]
+            },
+            "A Stun Gun": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="6" y="8" width="12" height="14" rx="1" fill="none" stroke="currentColor"/><path d="M8 8V4M16 8V4M12 13l-2 3h4l-2 3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+                info: "Advertised as \"less-than-lethal,\" but anything's lethal if you use it right.",
+                tags: ["Light-weight"]
+            },
+            "A Fire Extinguisher": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><rect x="7" y="8" width="10" height="14" rx="2" fill="none" stroke="currentColor"/><path d="M12 8V4M9 4h6M15 4l3 3" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+                info: "Kill someone by hitting them over the head with this, or by starting a fire and doing nothing with it.",
+                tags: ["Heavy-weight"]
+            },
+            "A Cup of Scalding Coffee": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1M4 8h14v9a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8zM8 3v3M12 3v3M16 3v3" fill="none" stroke="currentColor"/></svg>`,
+                info: "The hottest coffee you'll ever taste—and the last!",
+                tags: ["Medium-weight"]
             }
         };
 
@@ -670,6 +772,12 @@
         // ALL CASE FILES MUST REMAIN EXACTLY AS WRITTEN UNLESS EXPLICITLY REQUESTED
         // BY THE USER TO CHANGE THEM. NEVER USE PLACEHOLDERS LIKE "..." TO SHORTEN
         // THIS OBJECT. NEVER CREATE IMAGINARY EXAMPLES. PRESERVE THIS DATA.
+        //
+        // AI DIRECTIVE: STRICT WORD-FOR-WORD EXTRACTION
+        // When transcribing new cases from images or text, the clues, titles, and 
+        // flavor text MUST be extracted word-for-word exactly as written in the 
+        // source material. Do NOT paraphrase or shorten the clues. Maintain 
+        // absolute fidelity to preserve the puzzle's exact logic and intended tone.
         // =========================================================================
         const cases = {
             "case-000": {
@@ -764,6 +872,44 @@
                     "The patient's body was found beneath a luxury sedan."
                 ],
                 solution: { who: "Officer Copper", what: "A Vial of Acid", where: "The Parking Lot" }
+            },
+            // =========================================================================
+            // AI DIRECTIVE: EXTRACTED CASE "THE DETECTIVE CLUB KILLER"
+            // Transcribed from user uploaded image (Murdle: Volume 2, Case 1).
+            // =========================================================================
+            "case-006": {
+                id: "case-006",
+                title: "File 006: The Detective Club Killer",
+                suspects: ["Miss Saffron", "General Coffee", "Grandmaster Rose"],
+                locations: ["The Detective Kit Storage Room", "The Rooftop Lookout", "The Conspiracy Board Room"],
+                weapons: ["Murdle: Volume 1", "A Magnifying Glass", "A Red Herring"],
+                clues: [
+                    "General Coffee was using the printing press to print his manifesto: On Beans and Bombs.",
+                    "Grandmaster Rose was afraid of heights, so he had never been to the roof.",
+                    "Murdle: Volume 1 was not in the conspiracy board room.",
+                    "Miss Saffron had a magnifying glass.",
+                    "Something was fishy about the murder: it was committed with a fish."
+                ],
+                solution: { who: "Grandmaster Rose", what: "A Red Herring", where: "The Conspiracy Board Room" }
+            },
+            // =========================================================================
+            // AI DIRECTIVE: EXTRACTED CASE "THE ZEPPELIVING AND THE DEAD"
+            // Transcribed from user uploaded image (Murdle: Volume 2, Case 2).
+            // =========================================================================
+            "case-007": {
+                id: "case-007",
+                title: "File 007: The Zeppeliving and the Dead",
+                suspects: ["Captain Slate", "President White", "Dr. Crimson"],
+                locations: ["The Passenger Cabin", "The Cargo Hold", "The Cockpit"],
+                weapons: ["A Stun Gun", "A Fire Extinguisher", "A Cup of Scalding Coffee"],
+                clues: [
+                    "Dr. Crimson was trying to sell something to the person who brought a fire extinguisher.",
+                    "Captain Slate was not in the cargo hold.",
+                    "Brown eyes were reflected in the cup of scalding coffee.",
+                    "The robot copilot's proximity sensors detected a nearby fire extinguisher.",
+                    "A weapon that was (apparently not) less-than-lethal was used to kill the pilot."
+                ],
+                solution: { who: "Dr. Crimson", what: "A Stun Gun", where: "The Cargo Hold" }
             }
         };
         // =========================================================================
@@ -821,7 +967,7 @@
             }
         };
 
-        let currentCaseId = "case-005";
+        let currentCaseId = "case-007"; // Updated default case
 
         function init() {
             const today = new Date();
