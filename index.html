@@ -141,9 +141,15 @@
     <!-- Expanded Grid Popup -->
     <div id="grid-overlay" onclick="toggleGrid(false)">
         <div class="logic-grid-window" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center mb-4 pb-2 border-b-4 border-black">
-                <h3 class="font-black uppercase tracking-tighter text-xl italic">LOGIC CROSS-MATRIX</h3>
-                <button onclick="toggleGrid(false)" class="bg-red-600 text-white w-8 h-8 flex items-center justify-center font-black text-xl rounded-full border-2 border-black hover:bg-red-700">&times;</button>
+            <div class="flex justify-between items-start sm:items-center mb-4 pb-2 border-b-4 border-black gap-4">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                    <h3 class="font-black uppercase tracking-tighter text-xl italic m-0 leading-none">LOGIC CROSS-MATRIX</h3>
+                    <div class="flex gap-2">
+                        <button onclick="manualSave(event)" class="bg-black text-white px-3 py-1 text-[10px] font-black uppercase tracking-widest hover:bg-stone-800 active:translate-y-0.5 shadow-[2px_2px_0px_0px_rgba(251,191,36,1)] border-2 border-black transition-all">Save</button>
+                        <button onclick="manualLoad(event)" class="bg-white text-black px-3 py-1 text-[10px] font-black uppercase tracking-widest hover:bg-stone-100 active:translate-y-0.5 shadow-[2px_2px_0px_0px_rgba(251,191,36,1)] border-2 border-black transition-all">Load</button>
+                    </div>
+                </div>
+                <button onclick="toggleGrid(false)" class="bg-red-600 text-white w-8 h-8 flex-shrink-0 flex items-center justify-center font-black text-xl rounded-full border-2 border-black hover:bg-red-700">&times;</button>
             </div>
             
             <div class="overflow-auto custom-scrollbar border-2 border-black">
@@ -246,6 +252,18 @@
             <div class="grid grid-cols-2 gap-4">
                 <button onclick="document.getElementById('confirm-reset-modal').style.display='none'" class="bg-stone-300 text-black px-4 py-3 font-black uppercase text-lg hover:bg-stone-400 border-4 border-black transition-colors">Cancel</button>
                 <button onclick="resetCurrentCase()" class="bg-red-600 text-white px-4 py-3 font-black uppercase text-lg hover:bg-red-700 border-4 border-black transition-colors">Erase Data</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Clear Grid Modal -->
+    <div id="confirm-clear-modal" class="fixed inset-0 bg-black/80 z-[200] items-center justify-center p-4 hidden">
+        <div class="bg-white border-8 border-black p-8 max-w-md w-full shadow-[15px_15px_0px_0px_rgba(251,191,36,1)] text-center relative">
+            <h2 class="text-3xl font-black uppercase italic tracking-tighter mb-4 border-b-4 border-black pb-2 text-red-600">Clear Grid?</h2>
+            <p class="text-lg font-bold italic mb-6">Are you sure you want to clear all markings on this logic grid?</p>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="document.getElementById('confirm-clear-modal').style.display='none'" class="bg-stone-300 text-black px-4 py-3 font-black uppercase text-lg hover:bg-stone-400 border-4 border-black transition-colors">Cancel</button>
+                <button onclick="executeClearGrid()" class="bg-red-600 text-white px-4 py-3 font-black uppercase text-lg hover:bg-red-700 border-4 border-black transition-colors">Clear Grid</button>
             </div>
         </div>
     </div>
@@ -764,6 +782,150 @@
                 svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1M4 8h14v9a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8zM8 3v3M12 3v3M16 3v3" fill="none" stroke="currentColor"/></svg>`,
                 info: "The hottest coffee you'll ever taste—and the last!",
                 tags: ["Medium-weight"]
+            },
+            // =========================================================================
+            // AI DIRECTIVE: EXTRACTED ENTITIES FOR "TOUCH DOWN TO MURDER"
+            // =========================================================================
+            "Captain Slate_case-008": { 
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/></svg>`, 
+                info: "A real-life astronaut. The first woman to travel around the dark side of the moon, and also the first to be suspected of murdering her copilot.",
+                tags: ["5'5\"", "Left-handed", "Brown Eyes", "Brown Hair"]
+            },
+            "Chauffeur Bronze": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13h16v-2c0-2-2-4-5-4H9C6 7 4 9 4 11v2z"/><path d="M2 13h20v2H2z"/><circle cx="12" cy="10" r="1" fill="currentColor"/><path d="M10 10h4"/></svg>`,
+                info: "Lady Violet's chauffeur. He's an aristocrat himself, which shows you how important Lady Violet is.",
+                tags: ["5'10\"", "Right-handed", "Brown Eyes", "Blond Hair"]
+            },
+            "Boss Charcoal": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10c0-1 1-3 7-3s7 2 7 3H5z"/><path d="M6 10v2c0 3.3 2.7 6 6 6s6-2.7 6-6v-2"/><path d="M7 11h3c1 0 1.5 1 2 1s1-1 2-1h3"/><path d="M9 14h6"/></svg>`,
+                info: "A mob boss from the good ol' days when being a mob boss from the good ol' days meant something.",
+                tags: ["5'11\"", "Right-handed", "Brown Eyes", "Black Hair"]
+            },
+            "The Runway": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10 22L12 2l2 20"/><path d="M2 22h20"/><path d="M12 7v3M12 13v3"/></svg>`,
+                info: "So named because it's a great place for political prisoners to run away.",
+                tags: ["Outdoors"]
+            },
+            "The Baggage Claim": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M8 8V5c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v3"/><path d="M4 14h16"/><path d="M8 20v2M16 20v2"/></svg>`,
+                info: "Good luck getting your luggage: the bags that weren't lost were stolen.",
+                tags: ["Indoors"]
+            },
+            "The Currency Exchange": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6c0-1.7 1.3-3 3-3s3 1.3 3 3"/><path d="M6 6h12l-1 14H7L6 6z"/><path d="M12 10v6M10 11h4M10 15h4"/></svg>`,
+                info: "The exchange rate here is a rip-off. They're trading Drakonian dollars for US dollars one to one.",
+                tags: ["Indoors"]
+            },
+            "An Exposed Wire": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l6-6"/><path d="M15 9l6-6"/><path d="M9 15l2-2" stroke-dasharray="2 2"/><path d="M13 11l2-2" stroke-dasharray="2 2"/><path d="M11 6l2-2M16 9l2-2M6 13l-2 2M9 18l-2 2"/></svg>`,
+                info: "One of the last things you want to be exposed to. It's shocking!",
+                tags: ["Light-weight"]
+            },
+            "A Water Bottle": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="15" rx="2"/><path d="M9 7V4h6v3"/><path d="M10 2h4M12 2v2"/><path d="M7 12h10M7 17h10"/></svg>`,
+                info: "Ironic, because you'll die without it, too.",
+                tags: ["Medium-weight"]
+            },
+            "An '80s Cell Phone": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="8" width="12" height="14" rx="1"/><path d="M18 8V2M8 12h8M8 16h8M8 20h8"/><rect x="8" y="10" width="8" height="4" rx="1"/></svg>`,
+                info: "Heavier than some '80s cars. At this point, it's ancient technology.",
+                tags: ["Heavy-weight"]
+            },
+            // =========================================================================
+            // AI DIRECTIVE: EXTRACTED ENTITIES FOR "A LOCKED-ROOM MYSTERY"
+            // =========================================================================
+            "Officer Copper_case-009": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24"><path d="M4 10l2-4h12l2 4M2 10h20v4H2z" fill="none" stroke="currentColor"/><circle cx="12" cy="7" r="1.5" fill="currentColor"/><path d="M9 14v5h6v-5" fill="none" stroke="currentColor"/></svg>`,
+                info: "Now that Officer Copper works for the Drakonian government, she is no longer corrupt. (The penalty for corruption is death.)",
+                tags: ["5'5\"", "Right-handed", "Blue Eyes", "Blond Hair"]
+            },
+            "Comrade Champagne": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10c0-4 3-6 7-6s7 2 7 6"/><path d="M5 10v6l-2 2v2h4M19 10v6l2 2v2h-4"/><path d="M5 10h14"/><path d="M12 6l1 1.5 1.5.5-1 1 .5 1.5-2-1-2 1 .5-1.5-1-1 1.5-.5z"/></svg>`,
+                info: "Now that Comrade Champagne has moved to Drakonia, he has to work like everyone else.",
+                tags: ["5'11\"", "Left-handed", "Hazel Eyes", "Blond Hair"]
+            },
+            "Cosmonaut Bluski": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 0 0-8 8v4a8 8 0 0 0 16 0v-4a8 8 0 0 0-8-8z"/><path d="M8 10h8v4H8z"/><path d="M8 20v2h8v-2"/></svg>`,
+                info: "An ex-Soviet spaceman whose blood flows red. Sure, that's normal, but for him it's patriotic.",
+                tags: ["6'2\"", "Left-handed", "Brown Eyes", "Black Hair"]
+            },
+            "The Interrogation Room": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h16M6 10v10M18 10v10M4 12h16"/></svg>`,
+                info: "Two uncomfortable chairs and a table are reflected in the wall-sized mirror.",
+                tags: ["Indoors"]
+            },
+            "The \"Emergency Exit\"": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 12h16M12 3v18M8 12v3M16 12v3"/></svg>`,
+                info: "A euphemism for the 25th-floor window. If the guards don't like you, they throw you out of it.",
+                tags: ["Outdoors"]
+            },
+            "The Observation Room": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c0 0 3-7 10-7s10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>`,
+                info: "On the other side of the two-way mirror, you can watch the interrogation from a plush sofa.",
+                tags: ["Indoors"]
+            },
+            "The Big Red Book": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M5 8h14"/></svg>`,
+                info: "Written by Major Red, it argues for a world without rulers (other than him, of course).",
+                tags: ["Medium-weight"]
+            },
+            "A Heavy Boot": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M8 5v13h13v-2a3 3 0 0 0-3-3h-3V5H8z"/><path d="M7 3h9v2H7z"/><path d="M8 18v3h13v-3"/><path d="M12 18v3"/><path d="M15 8h2"/><path d="M15 11h2"/><path d="M15 14h2"/></svg>`,
+                info: "You could swing its steel toes at someone. (Or, better yet, kick them with it!)",
+                tags: ["Heavy-weight"]
+            },
+            "A Cheap Pen": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M19 5l-2-2-12 12v3h3L19 5z"/><path d="M16 8l-3-3"/></svg>`,
+                info: "Getting killed by an expensive pen is bad enough...",
+                tags: ["Light-weight"]
+            },
+            // =========================================================================
+            // AI DIRECTIVE: EXTRACTED ENTITIES FOR "DEATH ON THE LOW SEAS"
+            // =========================================================================
+            "Admiral Navy": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12c0-2 4-5 8-5s8 3 8 5v2H4v-2z"/><path d="M3 14h18"/><path d="M12 14v7M10 19h4M10 17h4"/><circle cx="12" cy="15" r="1" fill="currentColor"/></svg>`,
+                info: "The firstborn son of an Admiral Navy who himself was the son of an Admiral Navy.",
+                tags: ["5'9\"", "Right-handed", "Blue Eyes", "Brown Hair"]
+            },
+            "The Duchess of Vermillion": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 19h16v-2L18 7l-3.5 5-2.5-6-2.5 6L6 7l-2 10z"/></svg>`,
+                info: "A tall, old woman with tall, old secrets. If she is the murderer, then it certainly wouldn't be the first time.",
+                tags: ["5'9\"", "Left-handed", "Gray Eyes", "White Hair"]
+            },
+            "Uncle Midnight": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20l5-13 5 13H7z"/><circle cx="12" cy="5" r="2"/><path d="M5 20h14"/></svg>`,
+                info: "When his dad died, he bought a desert mansion with a pool and retired. He was seventeen.",
+                tags: ["5'8\"", "Left-handed", "Blue Eyes", "Brown Hair"]
+            },
+            "Overboard": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8c2 0 3 2 5 2s3-2 5-2 3 2 5 2 3-2 5-2"/><path d="M3 14c2 0 3 2 5 2s3-2 5-2 3 2 5 2 3-2 5-2"/><path d="M3 20c2 0 3 2 5 2s3-2 5-2 3 2 5 2 3-2 5-2"/></svg>`,
+                info: "Here you might get murdered by the sharks, too.",
+                tags: ["Outdoors"]
+            },
+            "The Captain's Quarters": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v6M20 14v6M4 14h16v-4a2 2 0 00-2-2H6a2 2 0 00-2 2v4z"/><path d="M8 10h8"/><rect x="15" y="6" width="3" height="4" rx="1"/></svg>`,
+                info: "Here, the captain told Logico the legend that Lord Violet had killed the person who killed his favorite butler.",
+                tags: ["Indoors"]
+            },
+            "The Deck": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17h18l-2-6H5l-2 6z"/><path d="M6 11h12V7H6v4z"/><path d="M9 7V4h2v3M13 7V4h2v3"/><circle cx="5" cy="17" r="1"/><circle cx="9" cy="17" r="1"/><circle cx="13" cy="17" r="1"/><circle cx="17" cy="17" r="1"/></svg>`,
+                info: "Look out over the ocean, but not too far, or someone might push you.",
+                tags: ["Outdoors"]
+            },
+            "A Life Preserver": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M9.1 9.1l-3.5-3.5M14.9 14.9l3.5 3.5M14.9 9.1l3.5-3.5M9.1 14.9l-3.5 3.5"/></svg>`,
+                info: "Getting killed by this would definitely be ironic.",
+                tags: ["Medium-weight"]
+            },
+            "A Diamond Necklace": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6c0 6 3 10 6 10s6-4 6-10" stroke-dasharray="2 2"/><path d="M12 16l2 3-2 3-2-3 2-3z" fill="currentColor" stroke="none"/></svg>`,
+                info: "Maybe the most expensive weapon in the whole book. It's missing one diamond!",
+                tags: ["Light-weight"]
+            },
+            "A Fish Bone": {
+                svg: `<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l4-4v8L4 12z"/><path d="M8 12h12"/><path d="M12 9v6M15 10v4M18 11v2"/></svg>`,
+                info: "Historically, what people have choked on the most.",
+                tags: ["Light-weight"]
             }
         };
 
@@ -910,11 +1072,74 @@
                     "A weapon that was (apparently not) less-than-lethal was used to kill the pilot."
                 ],
                 solution: { who: "Dr. Crimson", what: "A Stun Gun", where: "The Cargo Hold" }
+            },
+            // =========================================================================
+            // AI DIRECTIVE: EXTRACTED CASE "TOUCH DOWN TO MURDER"
+            // Transcribed from user uploaded image (Murdle: Volume 2, Case 3).
+            // =========================================================================
+            "case-008": {
+                id: "case-008",
+                title: "File 008: Touch Down to Murder",
+                suspects: ["Captain Slate", "Chauffeur Bronze", "Boss Charcoal"],
+                locations: ["The Runway", "The Baggage Claim", "The Currency Exchange"],
+                weapons: ["An Exposed Wire", "A Water Bottle", "An '80s Cell Phone"],
+                clues: [
+                    "Boss Charcoal always carried a variety of currencies, so he would never visit the exchange.",
+                    "Captain Slate was suspiciously thirsty: she kept drinking out of her water bottle.",
+                    "Due to their refined sensibilities, the aristocrat would never be around exposed wires.",
+                    "Ancient technology was found sitting on the runway.",
+                    "The body of the security guard was found in the baggage claim."
+                ],
+                solution: { who: "Boss Charcoal", what: "An Exposed Wire", where: "The Baggage Claim" }
+            },
+            // =========================================================================
+            // AI DIRECTIVE: EXTRACTED CASE "A LOCKED-ROOM MYSTERY"
+            // Transcribed from user uploaded image (Murdle: Volume 2, Case 4).
+            // =========================================================================
+            "case-009": {
+                id: "case-009",
+                title: "File 009: A Locked-Room Mystery",
+                suspects: ["Officer Copper", "Comrade Champagne", "Cosmonaut Bluski"],
+                locations: ["The Interrogation Room", "The \"Emergency Exit\"", "The Observation Room"],
+                weapons: ["The Big Red Book", "A Heavy Boot", "A Cheap Pen"],
+                clues: [
+                    "A scrap of paper bearing a famous saying of Major Red (\"In a street fight, ten people always beat one.\") was discovered under a plush sofa.",
+                    "You know what they say: the tallest suspect has the cheapest pen.",
+                    "Comrade Champagne had never been near the 25th-floor window.",
+                    "Either a cheap pen was found by the \"Emergency Exit,\" or Officer Copper carried the Big Red Book.",
+                    "The prisoner had been killed with a heavy boot. (Probably by being kicked by it.)"
+                ],
+                solution: { who: "Officer Copper", what: "A Heavy Boot", where: "The Interrogation Room" }
+            },
+            // =========================================================================
+            // AI DIRECTIVE: EXTRACTED CASE "DEATH ON THE LOW SEAS"
+            // Transcribed from user uploaded image (Murdle: Volume 2, Case 5).
+            // =========================================================================
+            "case-010": {
+                id: "case-010",
+                title: "File 010: Death on the Low Seas",
+                suspects: ["Admiral Navy", "The Duchess of Vermillion", "Uncle Midnight"],
+                locations: ["Overboard", "The Captain's Quarters", "The Deck"],
+                weapons: ["A Life Preserver", "A Diamond Necklace", "A Fish Bone"],
+                clues: [
+                    "They combed the deck, and they're certain the missing diamond wasn't there.",
+                    "An ironic weapon was discovered beside a shark.",
+                    "The suspect on the deck retired at seventeen.",
+                    "The Duchess of Vermillion was attracted to the person who brought a life preserver.",
+                    "The dead guest was found where Logico had been told a legend."
+                ],
+                solution: { who: "The Duchess of Vermillion", what: "A Diamond Necklace", where: "The Captain's Quarters" }
             }
         };
         // =========================================================================
         // END OF CASE FILES. AI DIRECTIVE: THE ABOVE DATA MUST ALWAYS BE PRESERVED.
         // =========================================================================
+
+        // Fallback memory storage in case the preview sandbox blocks localStorage
+        const memoryFallback = {
+            solvedCases: [],
+            gridState: {}
+        };
 
         // --- DATA STORE ARCHITECTURE ---
         // This acts as a middle-layer. If we ever move to IndexedDB, Firebase, or a REST API,
@@ -933,28 +1158,31 @@
             // Progress Management
             getSolvedCases: () => {
                 try { return JSON.parse(localStorage.getItem('murdle_solved_cases') || '[]'); }
-                catch { return []; }
+                catch { return memoryFallback.solvedCases; }
             },
             saveSolvedCase: (id) => {
                 const solved = MurdleStore.getSolvedCases();
                 if (!solved.includes(id)) {
                     solved.push(id);
-                    localStorage.setItem('murdle_solved_cases', JSON.stringify(solved));
+                    try { localStorage.setItem('murdle_solved_cases', JSON.stringify(solved)); }
+                    catch { memoryFallback.solvedCases = solved; }
                 }
             },
             removeSolvedCase: (id) => {
                 let solved = MurdleStore.getSolvedCases();
                 solved = solved.filter(caseId => caseId !== id);
-                localStorage.setItem('murdle_solved_cases', JSON.stringify(solved));
+                try { localStorage.setItem('murdle_solved_cases', JSON.stringify(solved)); }
+                catch { memoryFallback.solvedCases = solved; }
             },
             
             // Logic Grid State Management
             getGridState: () => {
                 try { return JSON.parse(localStorage.getItem(`murdle_matrix_${MurdleStore.version}`) || '{}'); }
-                catch { return {}; }
+                catch { return memoryFallback.gridState; }
             },
             saveGridState: (gridData) => {
-                localStorage.setItem(`murdle_matrix_${MurdleStore.version}`, JSON.stringify(gridData));
+                try { localStorage.setItem(`murdle_matrix_${MurdleStore.version}`, JSON.stringify(gridData)); }
+                catch { memoryFallback.gridState = gridData; }
             },
             clearGridStateForCase: (id) => {
                 const grid = MurdleStore.getGridState();
@@ -964,10 +1192,20 @@
                     }
                 });
                 MurdleStore.saveGridState(grid);
+            },
+            
+            // Checkpoint Management for Manual Save/Load
+            getCheckpoint: (caseId) => {
+                try { return JSON.parse(localStorage.getItem(`murdle_checkpoint_${MurdleStore.version}_${caseId}`) || 'null'); }
+                catch { return memoryFallback[`checkpoint_${caseId}`] || null; }
+            },
+            saveCheckpoint: (caseId, gridData) => {
+                try { localStorage.setItem(`murdle_checkpoint_${MurdleStore.version}_${caseId}`, JSON.stringify(gridData)); }
+                catch { memoryFallback[`checkpoint_${caseId}`] = gridData; }
             }
         };
 
-        let currentCaseId = "case-007"; // Updated default case
+        let currentCaseId = "case-010";
 
         function init() {
             const today = new Date();
@@ -1144,7 +1382,14 @@
             // future update when motives are officially added to cases. 
 
             const trH = document.createElement('tr');
-            trH.appendChild(Object.assign(document.createElement('th'), { className: 'corner-cell' }));
+            const cornerTh = document.createElement('th');
+            cornerTh.className = 'corner-cell relative';
+            cornerTh.innerHTML = `
+                <button onclick="clearCurrentGrid()" class="absolute inset-0 w-full h-full flex flex-col items-center justify-center text-[9px] md:text-[10px] font-black uppercase text-red-600 hover:bg-red-100 transition-colors">
+                    <svg class="w-4 h-4 md:w-5 md:h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    Clear
+                </button>`;
+            trH.appendChild(cornerTh);
             weapons.forEach((w, idx) => {
                 const th = document.createElement('th');
                 th.className = "header-cell" + (idx === weapons.length - 1 ? " section-divider-v" : "");
@@ -1331,6 +1576,69 @@
                     cell.className = `grid-cell cell-${s}`;
                 }
             });
+        }
+
+        function clearCurrentGrid() {
+            document.getElementById('confirm-clear-modal').style.display = 'flex';
+        }
+
+        function executeClearGrid() {
+            document.getElementById('confirm-clear-modal').style.display = 'none';
+            document.querySelectorAll('.grid-cell').forEach(c => {
+                c.dataset.state = 'empty';
+                c.innerHTML = '';
+                c.className = 'grid-cell cell-empty';
+            });
+            saveState(); // Overwrite the saved state with the cleared grid
+        }
+
+        function manualSave(event) {
+            const checkpointGrid = {};
+            document.querySelectorAll('.grid-cell').forEach(c => checkpointGrid[c.id] = c.dataset.state);
+            MurdleStore.saveCheckpoint(currentCaseId, checkpointGrid);
+            
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "SAVED!";
+            btn.classList.replace('bg-black', 'bg-green-600');
+            btn.classList.replace('border-black', 'border-green-800');
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.classList.replace('bg-green-600', 'bg-black');
+                btn.classList.replace('border-green-800', 'border-black');
+            }, 1000);
+        }
+
+        function manualLoad(event) {
+            const checkpoint = MurdleStore.getCheckpoint(currentCaseId);
+            const btn = event.target;
+            const originalText = btn.innerText;
+
+            if (checkpoint) {
+                Object.entries(checkpoint).forEach(([id, s]) => {
+                    const cell = document.getElementById(id);
+                    if (cell) {
+                        cell.dataset.state = s;
+                        cell.innerHTML = s === 'empty' ? '' : (s === 'x' ? 'X' : (s === 'maybe' ? '?' : 'O'));
+                        cell.className = `grid-cell cell-${s}`;
+                    }
+                });
+                saveState(); // Update the auto-save to match our newly loaded state
+                
+                btn.innerText = "LOADED!";
+                btn.classList.replace('bg-white', 'bg-green-100');
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.classList.replace('bg-green-100', 'bg-white');
+                }, 1000);
+            } else {
+                btn.innerText = "NO SAVE";
+                btn.classList.replace('bg-white', 'bg-red-200');
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.classList.replace('bg-red-200', 'bg-white');
+                }, 1000);
+            }
         }
 
         window.onload = init;
